@@ -5,6 +5,7 @@
 # Site
 title: LOG-STATION
 subtitle: '我们的记录'
+avatar: http://users.qzone.qq.com/fcg-bin/cgi_get_portrait.fcg?uins=2074178363
 description: '记录我们的生活点滴'
 keywords: ['LOG-STATION', '生活', '记录', '点滴', 'Hexo', '博客', '个人博客',
   '技术', '编程', '学习', '分享', '生活记录', '日常', '日志', 'Hexo博客']
