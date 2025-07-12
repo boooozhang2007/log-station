@@ -3,17 +3,18 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle: ''
-description: ''
-keywords:
-author: John Doe
-language: en
-timezone: ''
+title: LOG-STATION
+subtitle: '我们的记录'
+description: '记录我们的生活点滴'
+keywords: ['LOG-STATION', '生活', '记录', '点滴', 'Hexo', '博客', '个人博客',
+  '技术', '编程', '学习', '分享', '生活记录', '日常', '日志', 'Hexo博客']
+author: boooo&sren说b
+language: zh-CN
+timezone: 'Asia/Shanghai' # Set your timezone, e.g., 'America/New_York', 'Europe/London', 'Asia/Tokyo'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: https://20250612.xyz
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -40,7 +41,7 @@ external_link:
   exclude: ''
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
 syntax_highlighter: highlight.js
