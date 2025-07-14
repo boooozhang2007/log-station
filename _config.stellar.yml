@@ -344,10 +344,10 @@ footer:
   sitemap:
     - title: 博客
       items:
-      - [近期发布](/)
-      - [分类](/blog/categories/)
-      - [标签](/blog/tags/)
-      - [归档](/blog/archives/)
+      - '[近期发布](/)'
+      - '[分类](/blog/categories/)'
+      - '[标签](/blog/tags/)'
+      - '[归档](/blog/archives/)'
     - title: 项目
       items:
       - '[xxx](/)'
