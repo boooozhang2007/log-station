@@ -4,13 +4,13 @@
 
 # Site
 title: LOG-STATION
-subtitle: '我们的记录'
+subtitle: '记录'
 avatar: http://q1.qlogo.cn/g?b=qq&nk=2074178363&s=100
 favicon: http://q1.qlogo.cn/g?b=qq&nk=2074178363&s=100
-description: '记录我们的生活点滴'
+description: '记录我的生活点滴'
 keywords: ['LOG-STATION', '生活', '记录', '点滴', 'Hexo', '博客', '个人博客',
   '技术', '编程', '学习', '分享', '生活记录', '日常', '日志', 'Hexo博客']
-author: boooo&sren说b
+author: boooo
 language: zh-CN
 timezone: 'Asia/Shanghai' # Set your timezone, e.g., 'America/New_York', 'Europe/London', 'Asia/Tokyo'
 
