@@ -2,7 +2,7 @@
 title: HTTPS博客加载HTTP图床图片
 date: 2025-07-14 23:24:40
 tags:
-cover:https://picturesbyboooo.oss-cn-hongkong.aliyuncs.com/jimeng-2025-07-15-9427-%E7%94%9F%E6%88%90%E9%87%8D%E7%82%B9%E6%98%AF%E2%80%9CHTTPS%E5%8D%9A%E5%AE%A2%E5%8A%A0%E8%BD%BDHTTP%E5%9B%BE%E5%BA%8A%E5%9B%BE%E7%89%87%E2%80%9D%E5%AD%97%E6%A0%B7%E7%9A%84%E5%B0%81%E9%9D%A2%E5%9B%BE%E7%89%87.jpeg
+cover: https://picturesbyboooo.oss-cn-hongkong.aliyuncs.com/https.jpeg
 ---
 
 ### 关键要点
