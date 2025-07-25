@@ -345,18 +345,24 @@ footer:
     - title: 博客
       items:
       - '[近期发布](/)'
-      - '[分类](/blog/categories/)'
-      - '[标签](/blog/tags/)'
-      - '[归档](/blog/archives/)'
+      - '[分类](/categories/)'
+      - '[标签](/tags/)'
+      - '[归档](/archives/)'
     - title: 项目
       items:
-      - '[xxx](/)'
+      - '[博客](/)'
+      - '[记录](/log/)'
+      - '[探索](/gallery/)'
+      - '[友链](/friends/)'
     - title: 社交
       items:
-      - '[xxx](/)'
+      - '[QQ](http://wpa.qq.com/msgrd?v=3&uin=2074178363&site=qq&menu=yes)'
+      - '[微信](weixin://contacts/profile/zhang2074178363)'
+      - '[邮箱](mailto:2074178363@qq.com)'
+      - '[GitHub](https://github.com/zhang2074178363)'
     - title: 关于
       items:
-      - '[xxx](/)'
+      - '[我](/about)'
   content: | # 支持 Markdown 格式
     本站由 [{author.name}](/) 使用 [{theme.name} {theme.version}]({theme.tree}) 主题创建。
     本博客所有文章除特别声明外，均采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 许可协议，转载请注明出处。
