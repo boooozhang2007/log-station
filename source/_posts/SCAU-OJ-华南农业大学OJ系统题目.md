@@ -1815,6 +1815,18 @@ int main()
 
 答案还是比较巧妙的
 
+```c
+if(!(c>='a'&&c<='z'||c>='A'&&c<='Z')) word=0;
+```
+
+一直检测是否为字母，如果不是就不断设为0，如果是就进入
+
+```
+else if
+```
+
+
+
 
 ---
 
@@ -4568,3 +4580,3036 @@ int main()
 
 这段代码的做法主要就是使用`strcmp()`函数来进行字符串大小的比较
  排序算法是用的冒泡排序
+
+# 教材习题
+
+## 第三章
+
+### 18041 分期还款(加强版)
+
+#### Description
+
+从银行贷款金额为 \(d\)，准备每月还款额为 \(p\)，月利率为 \(r\) 。请编写程序输入这三个数值，计算并输出多少个月能够还清贷款，输出时保留 \(1\) 位小数。  
+如果无法还清，请输出 “God”  
+计算公式如下：
+
+$$
+m = \frac{\log{\frac{p}{p - d \times r}}}{\log{(1+r)}}
+$$
+
+
+#### 输入格式
+
+三个数，分别为货款金额、每月还款和月利率，以空格分隔，均为非负数，其中 \(d，p，r>=0\)
+
+#### 输出格式
+
+需要还款的月份
+
+#### 输入样例
+
+```
+50 50 0.01
+```
+
+#### 输出样例
+
+```
+1.0
+```
+
+#### 题解
+
+主要是使用 `if-else`筛去**无法计算**或者**不符合实际**的情况，其余的情况正常计算即可
+
+1. \(1 + r \gt 0\) 时，无法计算，输出 `God`
+2. \(p - d \times r = 0\) 时，该分数无意义，无法计算，输出 `God`
+3. \(p\) 与 \(p - d \times r\) 符号不一致时，\(\frac{p}{p - d \times r} \le 0\) 无法计算，输出 `God` （由于题目给出 p 是非负的 ，只需要判断 \(p\) 是否等于 \(0\) 和 \(p - d \times r\) 是否小于 \(0\) 即可）
+4. 当 \(d = 0\) 时，无需还款，直接输出 `0.0`
+5. 其他情况，直接计算即可
+
+#### 代码
+
+```
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    
+    double d,p,r;
+    scanf("%lf%lf%lf",&d,&p,&r);
+    
+    if(d == 0) {
+        printf("0.0\n");
+    }
+    else if(p - d*r <= 0 || p == 0) {
+        printf("God\n");
+    }
+    else{
+        printf("%.1f", log10(p/(p-d*r))/log10(1+r));
+    }
+    
+    return 0;
+}
+```
+
+## 第四章
+
+### 18042 计算分段函数值
+
+#### Description
+
+根据如下数学公式，编写程序输入 \(x\) ，计算并输出 \(y\) 的值，保留两位小数
+
+\[y =
+\begin{cases}
+x &, x \lt 1 \\
+2x - 1 &, 1 \le x \lt 10 \\
+3x - 11 &, x \ge 10
+\end{cases}
+\]
+
+#### 输入格式
+
+输入一个实数 \(x\)
+
+#### 输出格式
+
+输出函数值
+
+#### 输入样例
+
+```
+0
+```
+
+#### 输出样例
+
+```
+0.00
+```
+
+#### 题解
+
+开个 `if - else if - else` 选择分支结构就好了，分类讨论一下
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int main() {
+    double x;
+    scanf("%lf",&x);
+    double ans;
+    
+    if(x<1) {
+        ans = x;
+    }
+    else if(x >= 1 && x < 10) {
+        ans = 2 * x - 1;
+    }
+    else {
+        ans = 3 * x - 11;
+    }
+    
+    printf("%.2f",ans);
+    return 0;
+}
+```
+
+### 18043 找出3个数中最大的数
+
+#### Description
+
+编写程序，由键盘输入 \(3\) 个整数，输出其中最大的数。
+
+#### 输入格式
+
+三个整数，空格分隔
+
+#### 输出格式
+
+最大的数
+
+#### 输入样例
+
+```
+3 6 4
+```
+
+#### 输出样例
+
+```
+6
+```
+
+#### 题解
+
+用一个变量存储最大的那个数（即答案）  
+用两个 `if-else` ，找出最大的数
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int main()
+{
+    int a,b,c;
+    scanf("%d %d %d",&a,&b,&c);
+    
+    int max = a;
+    if(b > max) {
+        max = b;
+    }
+    if(c > max) {
+        max = c;
+    }
+    
+    printf("%d",max);
+    return 0;
+}
+```
+
+### 18044 成绩等级评分
+
+#### Description
+
+编写程序，由键盘输入一个百分制的整数成绩，要求输出对应的成绩等级。 \(90\) 分以上为 \(A\) ， \(80\) 到 \(89\) 分为 \(B\) ， \(70\) 到 \(79\) 分为 \(C\) ， \(60\) 到 \(69\) 分为 \(D\) ，  
+\(60\) 分以下为 \(E\) 。成绩不在 \(0\) 到 \(100\) 之间时输出 “error”
+
+#### 输入格式
+
+一个整数成绩
+
+#### 输出格式
+
+输出对应的等级或 error
+
+#### 输入样例
+
+```
+99
+```
+
+#### 输出样例
+
+```
+A
+```
+
+#### 题解
+
+直接来几个 `if - else if - else` 选择分支结构就好了
+
+搞什么`switch` 可以，但是没必要（个人看法）（我记得老师上课会讲这种写法的）
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int main() {
+    int score;
+    scanf("%d", &score);
+    
+    if(score>100 || score<0) {
+        printf("error");
+    }
+    else if(score>=90) {
+        printf("A");
+    }
+    else if(score>=80) {
+        printf("B");
+    }
+    else if(score>=70) {
+        printf("C");
+    }
+    else if(score>=60) {
+        printf("D");
+    }
+    else {
+        printf("E");
+    }
+        
+    return 0;
+}
+```
+
+### 18045 前一个和后一个字符
+
+#### Description
+
+编写程序，输入一个数字字符，输出其前一个和后一个的数字字符，如果输入的是0前一个输出  
+“first”，9后一个则输出“last”，输入的不是数学字符，输出“error”
+
+#### 输入格式
+
+一个字符
+
+#### 输出格式
+
+输出结果
+
+#### 输入样例
+
+```
+0
+```
+
+#### 输出样例
+
+```
+first 1
+```
+
+#### 题解
+
+依然是直接来几个 `if - else` 就好了
+
+先判断是不是数字
+
+再判断是不是 \(0\) 或者 \(9\)
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int main() {
+    
+    int ch = getchar();
+    
+    if('0'<=ch && ch<='9') {
+        
+        int num = ch - '0';
+        
+        if(num == 0) {
+            printf("first");
+        } else {
+            printf("%d",num - 1);
+        }
+        
+        printf(" ");
+        
+        if(num == 9) {
+            printf("last");
+        } else {
+            printf("%d",num + 1);
+        }
+    }
+    else {
+        printf("error");
+    }
+    
+    return 0;
+}
+```
+
+### 18037 20秒后的时间
+
+#### Description
+
+编写程序，输入三个整数变量 \(hour\)（小时）、\(minute\)（分钟）、\(second\)（秒）代表一个时间，  
+输出该时间 \(20\) 秒以后的时间。
+
+#### 输入格式
+
+一行三个整数，分别代表小时、分钟、秒，中间使用冒号分隔
+
+#### 输出格式
+
+输出一个时间，数字间用冒号分隔  
+小时、分钟、秒均占两个数字位，不足位用0补足
+
+#### 输入样例
+
+```
+15:30:41
+```
+
+#### 输出样例
+
+```
+15:31:01
+```
+
+#### 题解
+
+先给秒数加上 \(20\) ，后面再加几个 `if - else` 判断是否要进位就可以了
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int main()
+{
+    int h,m,s;
+    scanf("%d:%d:%d", &h,&m,&s);
+    
+    s += 20;
+    if(s >= 60) {
+        s %= 60;
+        m++;
+    }
+    if(m >= 60) {
+        m %= 60;
+        h++;
+    }
+    if(h >= 24) {
+        h %= 24;
+    }
+    
+    printf("%02d:%02d:%02d\n", h, m, s);
+    return 0;
+}
+```
+
+## 第五章
+
+### 18046 字母分类统计
+
+#### Description
+
+输入一行以换行符结束的字符，统计并输出其中英文字母、数字、空格和其它字符的个数。
+
+#### 输入格式
+
+一行字符，以换行符结束
+
+#### 输出格式
+
+一行4个数字分别为：英文字母、数字、空格和其它字符的个数，两数据之间以一个空格分隔
+
+#### 输入样例
+
+```
+ABC 456!
+```
+
+#### 输出样例
+
+```
+3 3 1 1
+```
+
+#### 题解
+
+判断字符属于那种类型
+
+使用 `if - else` 分类进行计数即可
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int main() {
+    char ch;
+    int nL=0, nN=0, nS=0, nO=0;
+    
+    while((ch = getchar()) != '\n')
+    {
+        if(ch >= 'a' && ch <= 'z'|| ch >= 'A' && ch <= 'Z') {
+            nL++;
+        }
+        else if (ch >= '0' && ch <= '9') {
+            nN++;
+        }
+        else if (ch == ' ') {
+            nS++;
+        }
+        else {
+            nO++;
+        }
+    }
+    
+    printf("%d %d %d %d\n", nL, nN, nS, nO);
+    return 0;
+}
+```
+
+### 18047 水仙花数
+
+#### Description
+
+输出所有的水仙花数。所谓水仙花数是一个 \(3\) 位的正整数，其各位数字的立方和等于这个数本身。  
+例如，\(153\) 是水仙花数，因为 \(1^3+5^3+3^3=153\)。
+
+#### 输入格式
+
+无
+
+#### 输出格式
+
+一行一个，由小到大输出所有水仙花数
+
+#### 输入样例
+
+无
+
+#### 输出样例
+
+略
+
+#### 题解
+
+从 \(100\) 遍历到 \(999\)  
+对每个数拆开位进行计算，判断是否相等
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int main() {
+    
+    for(int i = 100 ; i <= 999 ; i ++) {
+        
+        int f1 = i/100;
+        int f2 = (i - f1 * 100) / 10;
+        int f3 = i % 10;
+        
+        if(f1*f1*f1 + f2*f2*f2 + f3*f3*f3 == i) {
+            printf("%d\n",i);
+        }
+    }
+    
+    return 0;
+}
+```
+
+### 1037 计算数列和
+
+#### Description
+
+有数列：
+
+\[\frac{2}{1} \quad \frac{3}{2} \quad \frac{5}{3} \quad \frac{8}{5} \quad \frac{13}{8} \quad \frac{21}{13}
+\]
+
+编程实现，由键盘输入 \(n\)，计算输出数列前 \(n\) 项和。（结果保留四位小数，提示：要使用 \(double\) ，否则精度不够）
+
+#### 输出格式
+
+请按格式输出
+
+#### 输入样例
+
+```
+20
+```
+
+#### 输出样例
+
+```
+32.6603
+```
+
+#### 题解
+
+经过观察我们可以发现
+
+下一个分数的**分母** 等于上一个数的**分子**
+
+下一个数的的**分子** 等于上一个数的**分子和分母的和**
+
+就这样往下递推计算前 \(n\) 项和即可
+
+#### 代码
+
+```
+#include<stdio.h>
+
+int main() {   
+    double up = 2;
+    double down = 1;
+    double ans = 0;
+    
+    int n;
+    scanf("%d",&n);
+    
+    for(int i = 1 ; i <= n ; i ++) {
+        s += up/down;
+        a = a + b;
+        b = a - b;
+    }
+    
+    printf("%.4f\n",ans);
+}
+```
+
+### 18048 自由落体
+
+#### Description
+
+一个球从 \(100\) 米的高度自由落下，每次落地后弹起的原来高度的一半。计算并输出第 \(n\) 次落地时，共经过了多少米，第 \(n\) 次弹起的高度是多少？结果显示 \(3\) 位小数。
+
+#### 输入格式
+
+从键盘输入一个数 \(n(n>0)\)
+
+#### 输出格式
+
+输出两个数，分别为共经过的米数和第 \(n\) 次弹起的高度，以一个空格分隔
+
+#### 输入样例
+
+```
+1
+```
+
+#### 输出样例
+
+```
+100.000 50.000
+```
+
+#### 题解
+
+这题看似计数很麻烦，实际上只要分开算就好了
+
+观察可得，第 \(n\) 次落地，他经过了 \(n\) 次落地和 \(n-1\) 次弹起，
+
+我们只需要计算这些期间内经过的路程即可
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int main() {
+    double sum = 0;
+    double down = 100;
+    double up = 50;
+    
+    int n;
+    scanf("%d", &n);
+    for(int i = 1 ; i <= n ; i++) {
+        sum += down;
+        down /= 2;
+    }
+    for(int i = 1 ; i < n ; i++) {
+        sum += up;
+        up /= 2;
+    }
+    
+    printf("%.3f %.3f", sum, up);
+    return 0;
+}
+```
+
+### 18049 迭代法求平方根
+
+#### Description
+
+使用迭代法求 \(a\) 的平方根。求平方根的迭代公式如下，要求计算到相邻两次求出的 \(x\) 的差的绝对值小于 \(10^{-5}\) 时停止，结果显示 \(4\) 位小数
+
+\[x\_{n+1} = \frac{1}{2}(x\_n + \frac{a}{x\_n})
+\]
+
+#### 输入格式
+
+输入一个非负实数 \(a\)
+
+#### 输出格式
+
+计算并输出平方根
+
+#### 输入样例
+
+```
+16
+```
+
+#### 输出样例
+
+```
+4.0000
+```
+
+#### 题解
+
+使用`while` 循环，不断逼近即可求得答案
+
+注意 \(0 \div 0\) 无意义，需要特判
+
+#### 代码
+
+```
+#include <stdio.h>
+#include <math.h>
+
+int main()
+{
+    double num;
+    scanf("%lf", &num);
+    
+    if(num == 0) {
+        printf("%.4f",0);
+        return 0;
+    }
+    
+    double x0 = num;
+    double x1 = (x0 + num/x0) / 2;
+    
+    while(fabs(x0 - x1) >= 1e-5) {
+        x0 = (x1 + num/x1) / 2;
+        
+        double temp = x0;
+        x0 = x1;
+        x1 = temp;
+    }
+    
+    printf("%.4f\n", x1);
+    return 0;
+}
+```
+
+### 18050 打印三角形
+
+#### Description
+
+编写程序，输入整数 \(n\)，输出 \(n\) 行的字符图案。例如 \(n=5\) 时输出：
+
+```
+    *
+   **
+  ***
+ ****
+*****
+ ****
+  ***
+   **
+    *
+```
+
+#### 输入格式
+
+输入一个整数
+
+#### 输出格式
+
+输出 \(2 \times n-1\) 行的三角形
+
+#### 输入样例
+
+```
+2
+```
+
+# 输出样例
+
+```
+ *
+**
+ *
+```
+
+#### 题解
+
+只需要每个循环计算出打印多少个空格，打印多少个星号即可
+
+后面直接按这个数量和顺序输出就可以了
+
+#### 代码（分两个循环输出版本）
+
+```
+#include <stdio.h>
+
+int main() {
+    int n;
+    scanf("%d",&n);
+    
+    for(int i = 1 ; i < n ; i ++) {
+        
+        int space = n - i;
+        int xing = i;
+        
+        for(int j = 0 ; j < space ; j ++) {
+            printf(" ");
+        }
+        for(int j = 0 ; j < xing ; j ++) {
+            printf("*");
+        }
+        printf("\n");
+    }
+    
+    for(int i = 1 ; i <= n ; i ++) {
+        printf("*");
+    }
+    printf("\n");
+    
+    for(int i = n-1 ; i > 0 ; i --) {
+        
+        int space = n - i;
+        int xing = i;
+        
+        for(int j = 0 ; j < space ; j ++) {
+            printf(" ");
+        }
+        for(int j = 0 ; j < xing ; j ++) {
+            printf("*");
+        }
+        printf("\n");
+    }
+    
+    return 0;
+}
+```
+
+#### 代码（一个大循环搞定版本）
+
+```
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int n;
+    scanf("%d",&n);
+    
+    for(int i = -n+1 ; i < n ; i ++) {
+        int l = n - abs(i);
+        
+        int space = n - l;
+        int xing = l;
+        
+        for(int j = 0 ; j < space ; j ++) {
+            printf(" ");
+        }
+        for(int j = 0 ; j < xing ; j ++) {
+            printf("*");
+        }
+        printf("\n");
+    }
+    
+    return 0;
+}
+```
+
+### 18051 勾股数
+
+#### Description
+
+若三个正整数 \(a、b、c\) ，其中 \(a \le b \le c\) ，满足 \(a^2+b^2=c^2\) ，称这三个数为“勾股数”，例如：\(3、4、5\) 是勾股数。编程输出不大于 \(n\) 的所有勾股数。
+
+#### 输入格式
+
+输入一个数 \((n<=100)\)
+
+#### 输出格式
+
+输出所有勾股数，按第 \(1\) 个数字由小到大排列（若第 \(1\) 个数字相同，按第 \(2\) 个数字排）
+
+#### 输入样例
+
+```
+16
+```
+
+#### 输出样例
+
+```
+3 4 5
+5 12 13
+6 8 10
+9 12 15
+```
+
+#### 题解
+
+数据太弱，直接三层大循环就解决了
+
+可以用 `sqrt` 优化到两层大循环，但是还要判断，反正数据弱到三层能过那就三层算了
+
+#### 代码（三层循环）
+
+```
+#include <stdio.h>
+
+int main() {
+    int n;
+    scanf("%d",&n);
+    
+    for(int i = 1 ; i <= n ; i ++) {
+        for(int j = i ; j <= n ; j ++) {
+            for(int k = j ; k <= n ; k ++) {
+                if(i*i + j*j == k*k) {
+                    printf("%d %d %d\n",i,j,k);
+                }
+            }
+        }
+    }
+    
+    return 0;
+}
+```
+
+#### 代码（两层大循环）
+
+```
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    int n;
+    scanf("%d",&n);
+    
+    for(int i = 1 ; i <= n ; i ++) {
+        for(int j = i ; j <= n ; j ++) {
+            double ans = sqrt(i*i + j*j);
+            if((int)ans == ans && ans <= n) {
+                printf("%d %d %d\n",i,j,(int)ans);
+            }
+        }
+    }
+    
+    return 0;
+}
+```
+
+## 第六章
+
+### 18052 插入数据
+
+#### Description
+
+已经有一个按升序排列的数组，编写程序输入一个整数 \(x\)，把 \(x\) 插入到数组中，使数组仍然保持升序。  
+数组如下：
+
+\[2 \quad
+3 \quad
+5 \quad
+7 \quad
+11 \quad
+13 \quad
+17 \quad
+23 \quad
+29 \quad
+31 \quad
+34 \quad
+71 \quad
+79 \quad
+97 \quad
+103
+\]
+
+```
+#include <stdio.h>
+int a[16]={2, 3, 5, 7, 11, 13, 17, 23, 29, 31, 34, 71, 79, 97, 103};
+void display()
+{
+    int i;
+    for(i=0; i<16; i++) printf("%d ", a[i]);
+}
+int main()
+{
+_______________________
+    display();
+    return 0;
+}
+```
+
+#### 输入格式
+
+输入一个整数 \(x\)
+
+#### 输出格式
+
+输出更新后的数组元素
+
+#### 输入样例
+
+```
+5
+```
+
+#### 题解
+
+先把这个整数放到数组末尾，然后从后往前遍历：  
+凡是前一个元素比这个元素大的，就交换
+
+#### 代码
+
+```
+#include <stdio.h>
+int a[16]={2, 3, 5, 7, 11, 13, 17, 23, 29, 31, 34, 71, 79, 97, 103};
+void display()
+{
+    int i;
+    for(i=0; i<16; i++) printf("%d ", a[i]);
+}
+int main()
+{
+    scanf("%d",&a[15]);
+    for(int i = 15 ; i > 0 ; i --) {
+        if(a[i] < a[i-1]) {
+            int temp = a[i];
+            a[i] = a[i-1];
+            a[i-1] = temp;
+        }
+    }
+    display();
+    return 0;
+}
+```
+
+### 18053 大于平均分
+
+#### Description
+
+输入 \(10\) 个整数，计算它们的平均值，并统计有多少个数比平均值大。
+
+#### 输入格式
+
+\(10\) 个整数
+
+#### 输出格式
+
+比平均值大的数的个数
+
+#### 输入样例
+
+```
+0 1 2 3 4 5 6 7 8 9
+```
+
+#### 输出样例
+
+```
+5
+```
+
+#### 题解
+
+用数组存储输入  
+先遍历一遍数组，得出平均数  
+再进行比较和计数
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int main() {
+    int a[10];
+    for(int i = 0 ; i < 10 ; i ++) {
+        scanf("%d",&a[i]);
+    }
+    
+    double ave = 0;
+    for(int i = 0 ; i < 10 ; i ++) {
+        ave += a[i];
+    }
+    ave /= 10;
+    
+    int ans = 0;
+    for(int i = 0 ; i < 10 ; i ++) {
+        if(a[i] > ave) {
+            ans ++;
+        }
+    }
+    
+    printf("%d",ans);
+    return 0;
+}
+```
+
+### 18054 输出不同的数
+
+#### Description
+
+输入 \(10\) 个整数，输出其中不同的数，即如果一个数出现了多次，只输出一次。
+
+#### 输入格式
+
+输入 \(10\) 个整数
+
+#### 输出格式
+
+依次输出不同的数字（一行一个，从上到下依次输出先出现的数）
+
+#### 输入样例
+
+```
+1 2 1 3 3 2 4 5 5 9
+```
+
+#### 输出样例
+
+```
+1
+2
+3
+4
+5
+9
+```
+
+#### 题解
+
+开一个足够大的计数数组（比如包含 \(1000000\) 个元素）
+
+每次输入就使对应的数组元素 \(+ 1\)
+
+还有在对应数组元素为 \(0\) 时才打印该数字
+
+#### 代码
+
+```
+#include <stdio.h>
+
+const int N = 1e7;
+int a[N];
+
+int main() {
+    int num;
+    
+    for(int i = 0 ; i < 10 ; i ++) {
+        scanf("%d",&num);
+        
+        if(a[num] == 0) {
+            printf("%d\n",num);
+        }
+        
+        a[num] ++;
+    }
+    return 0;
+}
+```
+
+### 18055 主对角线上的元素之和
+
+#### Description
+
+输入一个 \(3\) 行 \(4\) 列的整数矩阵，计算并输出主对角线上的元素之和
+
+#### 输入格式
+
+\(3\) 行 \(4\) 列整数矩阵
+
+#### 输出格式
+
+主对角线上的元素之和
+
+#### 输入样例
+
+```
+1 2 3 4
+5 6 7 8
+9 10 11 12
+```
+
+#### 输出样例
+
+```
+18
+```
+
+#### 题解
+
+实际上只要把 \(a[0][0]\) 、\(a[1][1]\) 和 \(a[2][2]\) 加起来就可以了
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int main() {
+    int a[3][4];
+    for(int i = 0 ; i < 3 ; i ++) {
+        for(int j = 0 ; j < 4 ; j ++) {
+            scanf("%d",&a[i][j]);
+        }
+    }
+    
+    int ans = 0;
+    for(int i = 0 ; i < 3 ; i ++) {
+        ans += a[i][i];
+    }
+    
+    printf("%d",ans);
+    return 0;
+}
+```
+
+### 1051 找矩阵中的鞍点
+
+#### Description
+
+由键盘输入一个 \(3 \times 4\)（ \(3\) 行 \(4\) 列）的数字矩阵，其中任意两个数字均不相同。要求输出该数字矩阵中的鞍点（即在矩阵行中最大，列中最小的数）。  
+若没有鞍点，输出“NO”字样。
+
+#### 输入样例
+
+```
+87  90  110  98
+70  97  210  65
+99  45  120  30
+```
+
+#### 输出样例
+
+```
+110
+```
+
+#### 题解
+
+从左上角到右下角依次遍历
+
+看看有没有是鞍点的元素
+
+如果有就直接输出 并 `return 0;`
+
+如果没有就直接输出 `NO`
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int main() {
+    int a[3][4];
+    for(int i = 0 ; i < 3 ; i ++) {
+        for(int j = 0 ; j < 4 ; j ++) {
+            scanf("%d",&a[i][j]);
+        }
+    }
+    
+    for(int i = 0 ; i < 3 ; i ++) {
+        int max = 0;
+        for(int j = 0 ; j < 4 ; j ++) {
+            if(a[i][max] < a[i][j]) {
+                max = j;
+            }
+        }
+        
+        int min = i;
+        for(int j = 0 ; j < 3 ; j ++) {
+            if(a[min][max] > a[j][max]) {
+                min = j;
+            }
+        }
+        
+        if(min == i) {
+            printf("%d",a[min][max]);
+            return 0;
+        }
+    }
+    printf("NO");
+    return 0;
+}
+```
+
+### 18056 字母统计
+
+#### Description
+
+输入三行字符串（每行以换行回车为结束符），每行不超过 \(80\) 个字符。统计并输出其有多少个大写字母。
+
+#### 输入格式
+
+三行字符串
+
+#### 输出格式
+
+大写字母个数
+
+#### 输入样例
+
+```
+A-1 123
+ABC abc
+G
+```
+
+#### 输出样例
+
+```
+5
+```
+
+#### 题解
+
+首先，我们需要一个对应字符的 \(ASCII\) 码的计数数组  
+其次，其实不用按字符串输入，只需要当换行符对应的计数数组到达 \(3\) ，就可以停止读入字符了  
+最后，我们只要检查从 $A $ 到 \(Z\) 中间的字符出现过多少次就可以了
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int a[200];
+
+int main() {
+    char ch;
+    
+    while(ch = getchar()) {
+        
+        a[ch] ++;
+        
+        if(a['\n'] >= 3) {
+            break;
+        }
+    }
+    
+    int ans = 0;
+    for(int i = 'A' ; i <= 'Z' ; i ++) {
+        ans += a[i];
+    }
+    
+    printf("%d",ans);
+    return 0;
+}
+```
+
+### 1145 回文串
+
+#### Description
+
+读入一行字符串（不多于 \(80\) 个字符，以回车结束），判断该字符串是否为回文串（即从左向右拼写与从右向左拼写是一样的），是则输出 \(Y\) ，不是则输出 \(N\) 。
+
+#### 输入格式
+
+一行字符串
+
+#### 输出格式
+
+是则输出 \(Y\) ，不是则输出 \(N\)
+
+#### 输入样例
+
+```
+abba
+```
+
+#### 输出样例
+
+```
+Y
+```
+
+#### 题解
+
+先确定字符串长度  
+然后左右两边不断比较，往中间缩进  
+这种也叫双指针算法
+
+#### 代码
+
+```
+#include <stdio.h>
+#include <string.h>
+int main() {    
+    char a[100];
+    scanf("%s",&a);
+    
+    int l = strlen(a);
+    int left = 0 , right = l-1;
+    
+    while(left < right) {
+        if(a[left] != a[right]) {
+            printf("N");
+            return 0;
+        }
+        
+        left ++;
+        right --;
+    }
+    printf("Y");
+    
+    return 0;
+}
+```
+
+### 18057 ASCII码值之和的差
+
+#### Description
+
+输入两个字符串 \(s1\) 和 \(s2\) (每个串占一行，以换行回车符结束)，计算两个字符串的所有字符的 \(ASCII\) 码值之和的差。
+
+#### 输入格式
+
+两行字符，每行字符不超过 \(80\) 个字符
+
+#### 输出格式
+
+\(ASCII\) 码值之和的差
+
+#### 输入样例
+
+```
+234
+123
+```
+
+#### 输出样例
+
+```
+3
+```
+
+#### 题解
+
+其实这题我真的很想喷他
+
+因为他的题目真的没有交代清楚
+
+**注意！** 这里的差值**不是差的绝对值**
+
+**就是第一个减去第二个！**
+
+那就其实直接遍历求和再相减就可以了
+
+（但是下面的gets不能换成scanf，我也不知道为什么）
+
+#### 代码
+
+```
+#include <stdio.h>
+#include <string.h>
+
+int main() {    
+    char a[100],b[100];
+    gets(a);
+    gets(b);
+    
+    int l1 = strlen(a);
+    int l2 = strlen(b);
+    
+    int ans1 = 0;
+    int ans2 = 0;
+    
+    for(int i = 0 ; i < l1 ; i ++) {
+        ans1 += a[i];
+    }
+    for(int i = 0 ; i < l2 ; i ++) {
+        ans2 += b[i];
+    }
+        
+    printf("%d",ans1 - ans2);
+    
+    return 0;
+}
+```
+
+## 第七章
+
+### 18065 所有数字之和
+
+#### Description
+
+编写一个函数，计算一个整数的所有数字之和
+
+```
+#include "stdio.h"
+
+int sum(int n)
+{
+    _______________________
+}
+
+main()
+{
+    int n;
+    scanf("%d", &n);
+    printf("%d", sum(n));
+}
+```
+
+#### 输入格式
+
+由键盘输入一个整数
+
+#### 输出格式
+
+输出该数各位数字之和
+
+#### 输入样例
+
+```
+123
+```
+
+#### 输出样例
+
+```
+6
+```
+
+#### 题解
+
+每次操作把最后那一位数提取出来（对10取模）
+
+然后把那一位数删去（除以10）
+
+直到当前数字为0
+
+#### 代码
+
+```
+#include "stdio.h"
+
+int sum(int n)
+{
+    int ans = 0;
+    while(n) {
+        ans += n % 10;
+        n /= 10;
+    }
+    return ans;
+}
+
+main()
+{
+    int n;
+    scanf("%d", &n);
+    printf("%d", sum(n));
+}
+```
+
+### 18066 元音字母
+
+#### Description
+
+编写一个函数，挑选一个字符串中的所有元音字母构成并返回一个新的字符串
+
+```
+#include "stdio.h"
+
+void yuan(char *s,char *s2)
+{
+_______________________
+}
+
+main()
+{
+    char str[81], str2[81];
+    gets(str);
+    yuan(str,str2);
+    printf("%s", str2);
+}
+```
+
+#### 输入格式
+
+由键盘输入一行字符，以'\n'结束
+
+#### 输出格式
+
+输出新构成的字符串
+
+#### 输入样例
+
+```
+I am good
+```
+
+#### 输出样例
+
+```
+Iaoo
+```
+
+#### 题解
+
+直接把 aeiouAEIOU 单独拉出来  
+当出现以上数字的字符就把他单独放进一个新的字符串里面  
+记得最后放上空字符\0
+
+#### 代码
+
+```
+#include "stdio.h"
+
+void yuan(char *s,char *s2)
+{
+    int l = 0;
+    int idx = 0;
+    while(s[l] != '\0') {
+        if( s[l] == 'a' || 
+            s[l] == 'e' || 
+            s[l] == 'i' || 
+            s[l] == 'o' || 
+            s[l] == 'u' || 
+            s[l] == 'A' || 
+            s[l] == 'E' || 
+            s[l] == 'I' || 
+            s[l] == 'O' || 
+            s[l] == 'U') {
+                s2[idx] = s[l];
+                idx ++;
+            }
+            
+        l ++;
+    }
+    s2[idx] = '\0';
+}
+
+main()
+{
+    char str[81], str2[81];
+    gets(str);
+    yuan(str,str2);
+    printf("%s", str2);
+}
+```
+
+### 18067 字符统计
+
+#### Description
+
+编写一个函数，统计一个字符串中字母、数字和空格的个数。使用全局变量存放字母和数字个数，函数返回值是空格个数
+
+```
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
+int nL=0, nN=0;
+
+int statistics(char *s)
+{
+    _______________________
+}
+
+int main()
+{
+    char s[81];
+    int nS;
+    gets(s);
+    nS = statistics(s);
+
+    printf("%d %d %d\n", nL, nN, nS);
+    return 0;
+}
+```
+
+#### 输入格式
+
+输入一行字符，以'\n'符结束
+
+#### 输出格式
+
+统计结果
+
+#### 输入样例
+
+```
+Ab 45
+```
+
+#### 输出样例
+
+```
+2 2 1
+```
+
+#### 题解
+
+还是一样，遍历一下计数就好了
+
+#### 代码
+
+```
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
+int nL=0, nN=0;
+
+int statistics(char *s)
+{
+    int l = strlen(s);
+    int res = 0;
+    
+    for(int i = 0 ; i < n ; i ++) {
+        if(s[i] >= '0' && s[i] <= '9') {
+            nN ++;
+        }
+        else if(s[i] >= 'a' && s[i] <= 'z') {
+            nL ++;
+        }
+        else if(s[i] >= 'A' && s[i] <= 'Z') {
+            nL ++;
+        }
+        else if(s[i] == ' ') {
+            res ++;
+        }
+    }
+    
+    return res;int l = strlen(s);
+    int res = 0;
+    
+    for(int i = 0 ; i < l ; i ++) {
+        if(s[i] >= '0' && s[i] <= '9') {
+            nN ++;
+        }
+        else if(s[i] >= 'a' && s[i] <= 'z') {
+            nL ++;
+        }
+        else if(s[i] >= 'A' && s[i] <= 'Z') {
+            nL ++;
+        }
+        else if(s[i] == ' ') {
+            res ++;
+        }
+    }
+    
+    return res;
+}
+
+int main()
+{
+    char s[81];
+    int nS;
+    gets(s);
+    nS = statistics(s);
+
+    printf("%d %d %d\n", nL, nN, nS);
+    return 0;
+}
+```
+
+### 18068 选择排序
+
+#### Description
+
+输入10个整数，编写一个实现对数组进行选择排序的函数
+
+```
+#include <stdio.h>
+
+int sort(int a[], int n)
+{
+    int i,j,k,tmp;
+    for(i=0;i<n-1; i++)
+    {
+        k=i;
+        for(_______________________)
+            if(_______________________) k=j;
+        tmp=a[k];a[k]=a[i];a[i]=tmp;
+    }
+}
+
+int main()
+{
+    int a[10];
+    int i;
+    for(i=0; i<10; i++) scanf("%d", &a[i]);
+    sort(a,10);
+    for(i=0; i<10; i++) printf("%d\n", a[i]);
+    return 0;
+}
+```
+
+#### 输入格式
+
+\(10\) 个整数，以空格分隔
+
+#### 输出格式
+
+排序后的 \(10\) 个整数，一行一个数字
+
+#### 输入样例
+
+```
+3 2 1 6 5 4 9 8 7 0
+```
+
+#### 输出样例
+
+```
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+```
+
+#### 题解
+
+选择排序的思路就是:
+
+在未被排序的数字里找到最大/最小的数字
+
+然后放在这一堆数字的最前面/最后面
+
+以此往复，直到只剩下一个数字（就已经自动排好序了）
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int sort(int a[], int n)
+{
+    int i,j,k,tmp;
+    for(i=0;i<n-1; i++)
+    {
+        k=i;
+        for(j = i ; j < n ; j ++/*方框1*/)
+            if(a[k] > a[j]/*方框2*/) k=j;
+        tmp=a[k];a[k]=a[i];a[i]=tmp;
+    }
+}
+
+int main()
+{
+    int a[10];
+    int i;
+    for(i=0; i<10; i++) scanf("%d", &a[i]);
+    sort(a,10);
+    for(i=0; i<10; i++) printf("%d\n", a[i]);
+    return 0;
+}
+```
+
+### 18069 x的n次方
+
+#### Description
+
+输入正整数x和n，编写递归函数求x的n次方。
+
+```
+#include <stdio.h>
+
+int F(int x, int n)
+{
+    if(_____________) 
+        return _____________;
+    else 
+        return _____________;
+}
+
+int main()
+{
+    int x, n;
+    scanf("%d%d", &x, &n);
+    printf("%d", F(x, n));
+    return 0;
+}
+```
+
+#### 输入格式
+
+两个正整数，\(x\) 和 \(n\)
+
+#### 输出格式
+
+\(x\) 的 \(n\) 次方，假定结果不会超过 \(10\) 的次方。
+
+#### 输入样例
+
+```
+5 2
+```
+
+#### 输出样例
+
+```
+25
+```
+
+#### 题解
+
+一开始还以为是快速幂，后来发现一个 `if-else` 构造不出来  
+其实只要指数一直递减去递归，然后在指数为1的时候返回原数字，在回溯的时候把上一个数字乘上来就好了
+
+#### 代码
+
+```
+#include <stdio.h>
+
+int F(int x, int n)
+{
+    if(n == 1/*方框1*/) 
+        return x/*方框2*/;
+    else 
+        return F(x,n-1) * x /*方框3*/;
+}
+
+int main()
+{
+    int x, n;
+    scanf("%d%d", &x, &n);
+    printf("%d", F(x, n));
+    return 0;
+}
+```
+
+### 18070 矩阵行交换或列交换
+
+时间限制:1000MS 代码长度限制:10KB  
+提交次数:0 通过次数:0
+
+题型: 填空题 语言: G++;GCC;VC
+
+#### Description
+
+输入一个 \(4 \times 4\) 矩阵，编写两个函数分别实现对二维数组元素的行与行进行交换，以及列与列进行交换
+
+```
+#include <stdio.h>
+
+void swap(int *a, int *b)
+{
+    int temp;
+    temp=*a;*a=*b;*b=temp;
+}
+
+void col(int a[][4], int i, int j)
+{
+    _______________________
+}
+
+void row(int a[][4], int i, int j)
+{
+    _______________________
+}
+
+int main()
+{
+    int a[4][4];
+    int i,j;
+    for(i=0; i<4; i++)
+        for(j=0; j<4; j++)
+            scanf("%d", &a[i][j]);
+    col(a,0,2);
+    row(a,0,2);
+    col(a,1,3);
+    row(a,1,3);
+    col(a,0,3);
+    row(a,0,3);
+    for(i=0; i<4; i++)
+    {
+        for(j=0; j<4; j++)
+            printf("%d ", a[i][j]);
+        printf("\n");
+    }
+    return 0;
+}
+```
+
+#### 输入格式
+
+输入一个 \(4 \times 4\)矩阵
+
+#### 输出格式
+
+输出经过变换的矩阵
+
+#### 输入样例
+
+```
+1 2 3 4
+5 6 7 8
+9 10 11 12
+13 14 15 16
+```
+
+#### 输出样例
+
+```
+6 8 5 7
+14 16 13 15
+2 4 1 3
+10 12 9 11
+```
+
+#### 题解
+
+暴力去写就好了，把每一行/每一列的每个值都交换
+
+#### 代码
+
+```
+#include <stdio.h>
+
+void swap(int *a, int *b)
+{
+    int temp;
+    temp=*a;*a=*b;*b=temp;
+}
+
+void col(int a[][4], int i, int j)
+{
+    for(int k = 0 ; k < 4 ; k ++) {
+        int temp = a[i][k];
+        a[i][k] = a[j][k];
+        a[j][k] = temp;
+    }
+}
+
+void row(int a[][4], int i, int j)
+{
+    for(int k = 0 ; k < 4 ; k ++) {
+        int temp = a[k][i];
+        a[k][i] = a[k][j];
+        a[k][j] = temp;
+    }
+}
+
+int main()
+{
+    int a[4][4];
+    int i,j;
+    for(i=0; i<4; i++)
+        for(j=0; j<4; j++)
+            scanf("%d", &a[i][j]);
+    col(a,0,2);
+    row(a,0,2);
+    col(a,1,3);
+    row(a,1,3);
+    col(a,0,3);
+    row(a,0,3);
+    for(i=0; i<4; i++)
+    {
+        for(j=0; j<4; j++)
+            printf("%d ", a[i][j]);
+        printf("\n");
+    }
+    return 0;
+}
+```
+
+### 18071 学生信息统计
+
+#### Description
+
+输入 \(10\) 个学生 \(5\) 门课的考试成绩，分别用函数实现以下功能：  
+(1) 计算一个学生的平均分。  
+(2) 计算每门课程的平均分。  
+(3) 找出每门课程的最高分。  
+显示结果，显示两位小数。
+
+```
+#include <stdio.h>
+
+void average(double a[][5], int n)
+{
+_______________________
+}
+
+void average2(double a[][5], int n)
+{
+_______________________
+}
+
+void top(double a[][5], int n)
+{
+_______________________
+}
+
+int main()
+{
+    double a[10][5];
+    int i, j;
+    for(i=0; i<10; i++)
+        for(j=0; j<5; j++)
+            scanf("%lf", &a[i][j]);
+    average(a,10);
+    average2(a,10);
+    top(a,10);
+    return 0;
+}
+```
+
+#### 输入格式
+
+输入 \(10\) 个学生 \(5\) 门课成绩
+
+#### 输出格式
+
+输出每个学生的平均分，以空格分隔  
+输出每门课的平均分，以空格分隔  
+输出每门课的最高分，以空格分隔
+
+#### 输入样例
+
+```
+79 61 57 70 77
+67 73 83 72 70
+82 59 85 84 80
+80 53 67 72 79
+80 59 72 92 84
+88 72 79 79 80
+76 99 82 73 97
+67 96 81 69 63
+58 80 98 93 84
+66 61 64 57 64
+```
+
+#### 输出样例
+
+```
+68.80 73.00 78.00 70.20 77.40 79.60 85.40 75.20 82.60 62.40 
+74.30 71.30 76.80 76.10 77.80 
+88.00 99.00 98.00 93.00 97.00
+```
+
+#### 题解
+
+只要在对应的行或者列遍历一遍，计算结果后，直接输出即可（不要忘记换行）
+
+#### 代码
+
+```
+#include <stdio.h>
+
+void average(double a[][5], int n)
+{
+    for(int i = 0 ; i < 10 ; i ++) {
+        double ans = 0;
+        for(int j = 0 ; j < 5 ; j ++) {
+            ans += a[i][j];
+        }
+        ans /= 5;
+        printf("%.2f ",ans);
+    }
+    printf("\n");
+}
+
+void average2(double a[][5], int n)
+{
+    for(int i = 0 ; i < 5 ; i ++) {
+        double ans = 0;
+        for(int j = 0 ; j < 10 ; j ++) {
+            ans += a[j][i];
+        }
+        ans /= 10;
+        printf("%.2f ",ans);
+    }
+    printf("\n");
+}
+
+void top(double a[][5], int n)
+{
+    for(int i = 0 ; i < 5 ; i ++) {
+        double max = 0;
+        for(int j = 0 ; j < 10 ; j ++) {
+            if(max < a[j][i]) {
+                max = a[j][i];
+            }
+        }
+        printf("%.2f ",max);
+    }
+    printf("\n");
+}
+
+int main()
+{
+    double a[10][5];
+    int i, j;
+    for(i=0; i<10; i++)
+        for(j=0; j<5; j++)
+            scanf("%lf", &a[i][j]);
+    average(a,10);
+    average2(a,10);
+    top(a,10);
+    return 0;
+}
+```
+
+## 第八章
+
+### 18058 一年的第几天
+
+#### Description
+
+定义一个结构体类型表示日期类型（包括年、月、日）。程序中定义一个日期类型的变量，输入该日期的年、月、日，  
+计算并输出该日期是一年的第几天。
+
+```
+#include <stdio.h>
+
+struct DATE
+{
+_______________________
+};
+
+int days(struct DATE date)
+{
+_______________________
+}
+
+int main()
+{
+    struct DATE d;
+    scanf("%d-%d-%d", &d.year, &d.month, &d.day);
+    printf("%d", days(d));
+}
+```
+
+#### 输入格式
+
+年月日，格式如样例
+
+#### 输出格式
+
+该年的第几天
+
+#### 输入样例
+
+```
+2015-1-1
+```
+
+#### 输出样例
+
+```
+1
+```
+
+#### 题解
+
+因为以你那最多也就 \(366\) 天，我们可以从第一天开始遍历计数，直到现在这天就停止遍历计数就可以了  
+比较麻烦的是计算闰年的地方，大家可以看一下我的处理方式
+
+#### 代码
+
+```
+#include <stdio.h>
+
+struct DATE
+{
+    int year,month,day;
+};
+
+int days(struct DATE date)
+{
+    int ans = 0;
+    int m = 1;
+    int year = date.year;
+    
+    for(int i = 1 ; i <= 31 ; i ++) {
+        ans ++;
+        if(m == date.month && i == date.day) {
+            return ans;
+        }
+        
+        if(i == 28 && m == 2) {
+            if(year % 4 == 0) {
+                if(year % 100 == 0 && year % 400 != 0) {
+                    i = 0;
+                    m ++;   
+                }
+            } else {
+                i = 0;
+                m ++;
+            }
+        }
+        
+        if(i == 29 && m == 2) {
+            if(year % 4 == 0) {
+                if(year % 100 == 0 && year % 400 != 0) {
+    
+                } else {
+                    i = 0;
+                    m ++;
+                }
+            }
+        }
+        
+        if(i == 30) {
+            if(m == 4 || m == 6 || m == 9 || m == 11) {
+                i = 0;
+                m ++;
+            }
+        }
+        
+        if(i == 31) {
+            if(m == 1 || m == 3 || m == 5 || m == 7 ||  m == 8 || m == 10 || m == 12) {
+                i = 0;
+                m ++;
+            }
+        }
+    }
+}
+
+int main()
+{
+    struct DATE d;
+    scanf("%d-%d-%d", &d.year, &d.month, &d.day);
+    printf("%d", days(d));
+}
+```
+
+### 18059 学生成绩表
+
+#### Description
+
+输入 \(10\) 个学生，每个学生的数据包括学号、姓名、\(3\) 门课的成绩。定义结构体类型表示学生类型，输入 \(10\) 个学生的数据，  
+计算每个学生的平均成绩。按平均成绩由高到低输出所有学生信息，成绩相同时按学号从小到大输出。
+
+```
+#include <stdio.h>
+
+struct data
+{
+_______________________
+};
+
+int main()
+{
+    int i,j;
+    struct data stu[10],tmp;
+    for(i=0; i<10; i++)
+    {
+_______________________
+    }
+    for(i=0; i<9; i++)
+        for(j=0; j<9-i; j++)
+        {
+_______________________
+        }
+    for(i=0; i<10; i++)
+    {
+        printf("%d %s %.0lf %.0lf %.0lf\n", stu[i].num, stu[i].name, stu[i].score[0], stu[i].score[1], stu[i].score[2]);
+    }
+    return 0;
+}
+```
+
+#### 输入格式
+
+\(10\) 个学生信息，每行一个学生
+
+#### 输出格式
+
+如题
+
+#### 输入样例
+
+```
+1 aaa 50 60 70
+2 bbb 50 50 50
+3 ccc 60 70 80
+4 ddd 40 40 40 
+5 eee 70 80 90
+6 fff 30 30 30 
+7 ggg 80 90 100
+8 hhh 20 20 20
+9 iii 100 100 100
+10 jjj 10 10 10
+```
+
+#### 输出样例
+
+```
+9 iii 100 100 100
+7 ggg 80 90 100
+5 eee 70 80 90
+3 ccc 60 70 80
+1 aaa 50 60 70
+2 bbb 50 50 50
+4 ddd 40 40 40 
+6 fff 30 30 30 
+8 hhh 20 20 20
+10 jjj 10 10 10
+```
+
+#### 题解
+
+**注意！**
+
+因为这是填空题，所以后面出现的关于结构体的变量，你在声明的时候一定要保持 **变量名一致**！
+
+其次，关于排序的算法，这里其实你也改变不了他给你的算法，只能用冒泡排序，结构体可以直接交换就行
+
+#### 代码
+
+```
+#include <stdio.h>
+
+struct data
+{
+    int num;
+    char name[50];
+    double score[3];
+    double ave;
+};
+
+int main()
+{
+    int i,j;
+    struct data stu[10],tmp;
+    for(i=0; i<10; i++)
+    {
+        scanf("%d%s%lf%lf%lf", &stu[i].num, &stu[i].name, &stu[i].score[0], &stu[i].score[1], &stu[i].score[2]);
+        stu[i].ave = stu[i].score[0] + stu[i].score[1] + stu[i].score[2];
+        stu[i].ave /= 3;
+    }
+    for(i=0; i<9; i++)
+        for(j=0; j<9-i; j++)
+        {
+            if(stu[j].ave < stu[j + 1].ave) {
+                tmp = stu[j];
+                stu[j] = stu[j + 1];
+                stu[j + 1] = tmp;
+            }
+        }
+    for(i=0; i<10; i++)
+    {
+        printf("%d %s %.0lf %.0lf %.0lf\n", stu[i].num, stu[i].name, stu[i].score[0], stu[i].score[1], stu[i].score[2]);
+    }
+    return 0;
+}
+```
+
+### 18060 删除空格
+
+#### Description
+
+用指针方法解决，输入一个字符串，删除字符串中所有空格后，输出字符串
+
+```
+#include <stdio.h>
+
+void removeSpace(char *s)
+{
+_______________________
+}
+
+int main()
+{
+    char s[81];
+    gets(s);
+    removeSpace(s);
+    printf("%s", s);
+    return 0;
+}
+```
+
+#### 输入格式
+
+一行字符，以换行回车结束，最多不超过80个字符
+
+#### 输出格式
+
+删除所有空格后输出
+
+#### 输入样例
+
+```
+abc    456
+```
+
+#### 输出样例
+
+```
+abc456
+```
+
+#### 题解
+
+可以去了解一下双指针算法  
+做一个快指针，一个慢指针，两边同向出发，遇到空格快指针就跳过，其余情况把快指针传给慢指针，直到遇到空字符为止
+
+#### 代码
+
+```
+#include <stdio.h>
+
+void removeSpace(char *s)
+{
+    int l = 0, r = 0;
+    while(1) {
+        if(s[r] == ' ') {
+            r ++;
+            continue;
+        }
+        
+        s[l] = s[r];
+        
+        if(s[r] == '\0') {
+            return;
+        }
+        
+        l ++;
+        r ++;
+    }
+}
+
+int main()
+{
+    char s[81];
+    gets(s);
+    removeSpace(s);
+    printf("%s", s);
+    return 0;
+}
+```
+
+### 18061 数的交换
+
+#### Description
+
+输入 \(10\) 个整数，把其中最小的数与第一个数交换，最大的数与最后一个数交换。使用 \(3\) 个函数解决问题：  
+(1) 输入 \(10\) 个整数的函数  
+(2) 进行交换处理的函数  
+(3) 输出 \(10\) 个数的函数
+
+```
+#include <stdio.h>
+
+void input(int a[])
+{
+    _______________________
+}
+
+void swap(int a[])
+{
+    _______________________
+}
+
+void display(int a[])
+{
+    int i;
+    for(i=0; i<10; i++)
+        printf("%d\n", a[i]);
+}
+
+int main()
+{
+    int a[10];
+    input(a);
+    printf("input done\n");
+    swap(a);
+    printf("swap done\n");
+    display(a);
+    printf("display done\n");
+    return 0;
+}
+```
+
+#### 输入格式
+
+输入 \(10\) 个整数
+
+#### 输出格式
+
+输出结果，一行一个数字
+
+#### 输入样例
+
+```
+2 1 3 4 5 6 7 8 9 0
+```
+
+#### 输出样例
+
+```
+input done
+swap done
+0
+1
+3
+4
+5
+6
+7
+8
+2
+9
+display done
+```
+
+#### 题解
+
+这题的表述很简单，但是他有一个点没有讲清楚，那就是：
+
+**两个数之间只交换一次！**
+
+所以我们只需要判断第二次交换的两个数是不是第一次交换得两个数就可以了
+
+如果是，就直接返回；
+
+如果不是，就交换
+
+**特殊一点讲**
+
+只要确定第一次交换的数字就是最大值和最小值，那我们就可以只交换一次了
+
+#### 代码
+
+```
+#include <stdio.h>
+
+void input(int a[])
+{
+    for(int i = 0 ; i < 10 ; i ++) {
+        scanf("%d",&a[i]);
+    }
+}
+
+void swap(int a[])
+{
+    int max = 0,min = 0;
+    
+    for(int i = 0 ; i < 10 ; i ++) {
+        if(a[i] < a[min]) min = i;
+    }
+    
+    int temp = a[0];
+    a[0] = a[min];
+    a[min] = temp;
+    
+    for(int i = 0 ; i < 10 ; i ++) {
+        if(a[i] > a[max]) max = i;
+    }
+    
+    if(min == 9 && max == 9) return;
+    
+    temp = a[9];
+    a[9] = a[max];
+    a[max] = temp;
+}
+
+void display(int a[])
+{
+    int i;
+    for(i=0; i<10; i++)
+        printf("%d\n", a[i]);
+}
+
+int main()
+{
+    int a[10];
+    input(a);
+    printf("input done\n");
+    swap(a);
+    printf("swap done\n");
+    display(a);
+    printf("display done\n");
+    return 0;
+}
+```
+
+### 18062 二维数组每行中的最大值
+
+#### Description
+
+输入一个 \(4 \times 4\) 的二维整型数组，使用指针变量查找并输出二维整型数组中每一行的最大值。
+
+```
+#include <stdio.h>
+
+void find(int a[][4])
+{
+    int (*p)[4], *q, *max;
+    for(_______________________)
+    {
+        max=*p;
+        for(_______________________)
+        {
+_______________________
+        }
+        printf("%d\n", *max);
+    }
+}
+
+int main()
+{
+    int a[4][4],i,j;
+    for(i=0; i<4; i++)
+        for(j=0; j<4; j++)
+            scanf("%d", &a[i][j]);
+    find(a);
+    return 0;
+}
+```
+
+#### 输入格式
+
+\(4 \times 4\) 的整数矩阵
+
+#### 输出格式
+
+每行最大值，一行一个
+
+#### 输入样例
+
+```
+1 2 3 4
+8 7 6 5
+1 1 1 1
+2 2 2 2
+```
+
+#### 输出样例
+
+```
+4
+8
+1
+2
+```
+
+#### 题解
+
+其实这题和普通的找最大值没有区别
+
+只不过是把下标变成指针而已，还有二级指针
+
+注意一下指针之间的比较和交换即可
+
+#### 代码
+
+```
+#include <stdio.h>
+
+void find(int a[][4])
+{
+    int (*p)[4], *q, *max;
+    for(p = a; p < a + 4 ; p ++/*方框1*/)
+    {
+        max=*p;
+        for(q = *p + 1 ; q < *p + 4; q ++/*方框2*/)
+        {
+            if(*max < *q) {*max = *q;} /*方框3*/
+        }
+        printf("%d\n", *max);
+    }
+}
+
+int main()
+{
+    int a[4][4],i,j;
+    for(i=0; i<4; i++)
+        for(j=0; j<4; j++)
+            scanf("%d", &a[i][j]);
+    find(a);
+    return 0;
+}
+```
+
+### 18063 圈中的游戏
+
+#### Description
+
+有 \(n\) 个人围成一圈，从第 \(1\) 个人开始报数 \(1、2、3\) ，每报到 \(3\) 的人退出圈子。编程使用链表找出最后留下的人。
+
+#### 输入格式
+
+输入一个数 \(n\) ， $1000000 \ge n \gt 0 $
+
+#### 输出格式
+
+输出最后留下的人的编号
+
+#### 输入样例
+
+```
+3
+```
+
+#### 输出样例
+
+```
+2
+```
+
+#### 题解
+
+其实这是一道经典的数论题 ：约瑟夫问题，大家可以去了解一下
+
+我当时是用的循环链表解决的
+
+当然也有另一种更简便的写法，大家在后面也可以欣赏一下（至于这个算法的理论本身我就不给出了，大家自己去了解一下就好啦）
+
+#### 代码（循环链表）
+
+```
+#include <stdio.h>
+struct round
+{
+    int num;
+    struct round *next;
+} ;
+
+int main(void)
+{
+    int n;
+    scanf("%d",&n);
+    struct round lin[n];
+    struct round *head=&lin[0],*pt=head,*ptt;
+    for(int i=0;i<n;i++)
+    {
+        lin[i].num=i+1;
+        if(i==n-1)
+            lin[i].next=&lin[0];
+        else
+            lin[i].next=&lin[i+1];
+    }
+    
+    while(head->next!=head)
+    {
+        pt=pt->next;
+        ptt=pt->next;
+        if(ptt==head)
+            head=ptt->next;
+        pt->next=ptt->next;
+        pt=pt->next;
+    }
+    printf("%d",head->num);
+}
+```
+
+#### 代码（O(n)版）
+
+```
+#include <stdio.h>
+
+int main()
+{
+    int n;
+    scanf("%d",&n);
+    int f = 0;
+    
+    for(int i = 1 ; i <= n ; i ++) {
+        f = (f + 3) % i;
+    }
+    
+    printf("%d",f+1);
+    return 0;
+}
+```
+
+### 18064 链表的有序合并
+
+#### Description
+
+已知有两个链表 \(a\) 和 \(b\) ，结点类型相同，均包括一个 \(int\) 类型的数据。编程把两个链表合并成一个，结点按升序排列。
+
+```
+#include "stdio.h"
+#include "malloc.h"
+#define LEN sizeof(struct DATA)
+
+struct DATA
+{
+     long num;
+     struct DATA *next;
+};
+
+struct DATA *create(int n)
+{
+     struct DATA *head=NULL,*p1=NULL,*p2=NULL;
+     int i;
+     for(i=1;i<=n;i++)
+     {  p1=(struct DATA *)malloc(LEN);
+        scanf("%ld",&p1->num);
+        p1->next=NULL;
+        if(i==1) head=p1;
+        else p2->next=p1;
+        p2=p1;
+      }
+      return(head);
+}
+
+struct DATA *merge(struct DATA *head, struct DATA *head2)
+{
+    _______________________
+    return head;
+}
+
+struct DATA *insert(struct DATA *head, struct DATA *d)
+{
+    _______________________
+    return head;
+}
+
+struct DATA *sort(struct DATA *head) 
+{ 
+    _______________________
+    return head;
+} 
+
+void print(struct DATA *head)
+{
+    struct DATA *p;
+    p=head;
+    while(p!=NULL)
+    {
+        printf("%ld",p->num);
+        p=p->next;
+        printf("\n");
+    }
+}
+
+main()
+{
+    struct DATA *head, *head2;
+    int n;
+    long del_num;
+    scanf("%d",&n);
+    head=create(n);
+    scanf("%d",&n);
+    head2=create(n);
+    head = merge(head, head2);
+    head = sort(head);
+    print(head);
+}
+```
+
+#### 输入格式
+
+第一行一个数 \(n\) ，表示第一个列表的数据个数  
+每二行为 \(n\) 个数  
+第三行为一个数 \(m\)  
+第四行为 \(m\) 个数
+
+#### 输出格式
+
+输出合并后的有序的数据，一行一个数
+
+#### 输入样例
+
+```
+2
+4 8
+3
+9 1 5
+```
+
+#### 输出样例
+
+```
+1
+4
+5
+8
+9
+```
+
+#### 题解
+
+这道题目的本意是，让我们写一个插入的函数  
+然后在sort的时候遍历找到应该插入的位置  
+然后调用这个插入函数，结构体插进去  
+实现“插入”排序
+
+其实我们也可以直接把整个链表挂在前一个链表的后面  
+然后对整个链表进行一个排序  
+但是这种虽然写起来简单，省下一个函数  
+但是时间复杂度差，就不展示了
+
+#### 代码
+
+```
+#include "stdio.h"
+#include "malloc.h"
+#define LEN sizeof(struct DATA)
+
+struct DATA
+{
+     long num;
+     struct DATA *next;
+};
+
+struct DATA *create(int n)
+{
+     struct DATA *head=NULL,*p1=NULL,*p2=NULL;
+     int i;
+     for(i=1;i<=n;i++)
+     {  p1=(struct DATA *)malloc(LEN);
+        scanf("%ld",&p1->num);
+        p1->next=NULL;
+        if(i==1) head=p1;
+        else p2->next=p1;
+        p2=p1;
+      }
+      return(head);
+}
+
+struct DATA *merge(struct DATA *head, struct DATA *head2)
+{
+    struct DATA *p;
+    p=head;
+    while(p->next!=NULL) 
+        p=p->next;
+    p->next = head2;
+    return head;
+    return head;
+}
+
+struct DATA *insert(struct DATA *head, struct DATA *d)
+{
+    struct DATA *p0,*p1,*p2;
+    p1=head;
+    p0=d;
+    if(head==NULL) {
+        head=p0;
+        p0->next=NULL;
+    }
+    else {
+        while((p0->num>p1->num)&&(p1->next!=NULL)) {
+            p2=p1;
+            p1=p1->next;
+        }
+        if(p0->num<=p1->num) { 
+            if(head==p1) head=p0;
+            else p2->next=p0;
+            p0->next=p1;
+        }
+        else {
+            p1->next=p0;
+            p0->next=NULL;
+        }
+    }
+    return head;
+}
+
+struct DATA *sort(struct DATA *head) 
+{
+    struct DATA *p1,*p2;
+    p2=head;p1=head;
+    p2=p2->next;
+    p1->next=NULL;
+    p1=p2;
+    while(p2->next!=NULL) {
+        p2=p2->next;
+        p1->next=NULL;
+        head=insert(head,p1);
+        p1=p2;
+    }
+    head=insert(head,p1);
+    return head;
+} 
+
+void print(struct DATA *head)
+{
+    struct DATA *p;
+    p=head;
+    while(p!=NULL)
+    {
+        printf("%ld",p->num);
+        p=p->next;
+        printf("\n");
+    }
+}
+
+main()
+{
+    struct DATA *head, *head2;
+    int n;
+    long del_num;
+    scanf("%d",&n);
+    head=create(n);
+    scanf("%d",&n);
+    head2=create(n);
+    head = merge(head, head2);
+    head = sort(head);
+    print(head);
+}
+```
