@@ -4595,7 +4595,6 @@ int main()
 
 $$
 m = \frac{\log{\frac{p}{p - d \times r}}}{\log{(1+r)}}
-
 $$
 
 
@@ -6229,24 +6228,6 @@ int statistics(char *s)
     int res = 0;
     
     for(int i = 0 ; i < n ; i ++) {
-        if(s[i] >= '0' && s[i] <= '9') {
-            nN ++;
-        }
-        else if(s[i] >= 'a' && s[i] <= 'z') {
-            nL ++;
-        }
-        else if(s[i] >= 'A' && s[i] <= 'Z') {
-            nL ++;
-        }
-        else if(s[i] == ' ') {
-            res ++;
-        }
-    }
-    
-    return res;int l = strlen(s);
-    int res = 0;
-    
-    for(int i = 0 ; i < l ; i ++) {
         if(s[i] >= '0' && s[i] <= '9') {
             nN ++;
         }
