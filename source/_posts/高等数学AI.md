@@ -7,6 +7,10 @@ mathjax: true
 
 ---
 
+本文档来自
+
+{% link https://www.bilibili.com/video/BV1j44y1E7ot %}
+
 ## 第一章 极限
 
 ### 第一部分：微积分的本质思想
