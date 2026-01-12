@@ -201,8 +201,8 @@ mathjax: true
     *   $\int x e^{x^2} dx \to$ 凑 $d(x^2)$，变成 $\frac{1}{2} e^{x^2}$
     *   $\int \frac{e^x}{e^{2x}+1} dx \to$ 分子分母同乘 $e^x$ 凑 $d(e^x)$，变成 $\arctan(e^x)$
 *   **三角函数有理式积分规律**：
-    *   若 $f(-\sin x, \cos x) = -f(\sin x, \cos x)$（关于 $\sin$ 是奇函数），凑 $d(\cos x)$。
-    *   若 $f(\sin x, -\cos x) = -f(\sin x, \cos x)$（关于 $\cos$ 是奇函数），凑 $d(\sin x)$。
+    *   若 $f(-\sin x, \cos x) = -f(\sin x, \cos x)$（关于 $\sin$ 是奇函数），凑 $d(\sin x)$。
+    *   若 $f(\sin x, -\cos x) = -f(\sin x, \cos x)$（关于 $\cos$ 是奇函数），凑 $d(\cos x)$。
     *   若 $f(-\sin x, -\cos x) = f(\sin x, \cos x)$（都变号不变），凑 $d(\tan x)$。
 
 #### 3. 第二类换元法 (去根号)
