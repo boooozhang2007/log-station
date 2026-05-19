@@ -319,8 +319,8 @@ class Book(Base):
 
 #### 建表
 
-```
-#寤鸿〃
+```python
+#上下文管理器
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with async_engine.begin() as conn:
