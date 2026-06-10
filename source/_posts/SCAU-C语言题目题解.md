@@ -38,7 +38,7 @@ The first C Program
 #include <stdio.h>
 int main()
 {
-    printf(“The first C Program\n”);
+    printf("The first C Program\n");
     return 0;
 }
 
@@ -103,8 +103,8 @@ int main()
 int main()
 {
     int a,b;
-    scanf(“%d%d”,&a,&b);
-    printf(“%d”,a+b);
+    scanf("%d%d",&a,&b);
+    printf("%d",a+b);
     return 0;
 }
 
@@ -152,10 +152,10 @@ int main()
 int main()
 {
     int a,b;
-    scanf(“%d%d”,&a,&b);
+    scanf("%d%d",&a,&b);
     
-    if(a>b) printf(“%d”,a);
-    else printf(“%d”,b);
+    if(a>b) printf("%d",a);
+    else printf("%d",b);
     return 0;
 }
 
@@ -178,8 +178,8 @@ int max(int a,int b)
 int main()
 {
     int a,b;
-    scanf(“%d%d”,&a,&b);
-    printf(“%d”,max(a,b));
+    scanf("%d%d",&a,&b);
+    printf("%d",max(a,b));
     return 0;
 }
 
@@ -271,7 +271,7 @@ C:\ABC.TXT
 #include <stdio.h>
 int main()
 {
-    printf(“C:\\ABC.TXT”);
+    printf("C:\\ABC.TXT");
     return 0;
 }
 
@@ -329,7 +329,7 @@ int main()
 
 
 -  `b=15/10;`
- 把 15÷10 的值赋值给 b ，原本 15÷10 应该是等于 1.5 的，但是除号两边都是整型，因此 1.5 要向下取整，也就是 ⌊1015⌋ 得到 1 ，因此现在 b=1 。
+ 把 15÷10 的值赋值给 b ，原本 15÷10 应该是等于 1.5 的，但是除号两边都是整型，因此 1.5 要向下取整，也就是 ⌊15/10⌋ 得到 1 ，因此现在 b=1 。
 
 
 -  `c=b++;`
@@ -354,9 +354,9 @@ int main()
 
 - `e=15/10;`
  这个地方经常容易错！！很多人以为是 1.500000 ！！！
-  这一行的意思是把`15/10`的值赋值给 e，原本 15÷10 应该是等于 1.5 的，但是除号两边都是整型，因此 1.5 要向下取整，也就是⌊1015⌋ 得到 1 。但是 1 是整型，e 是浮点型，所以要先把 1 转换成浮点型，也就是 1.000000 ，再赋值给 e 。所以现在 e=1.000000
+  这一行的意思是把`15/10`的值赋值给 e，原本 15÷10 应该是等于 1.5 的，但是除号两边都是整型，因此 1.5 要向下取整，也就是⌊15/10⌋ 得到 1 。但是 1 是整型，e 是浮点型，所以要先把 1 转换成浮点型，也就是 1.000000 ，再赋值给 e 。所以现在 e=1.000000
 - `f=d/10;`
- 这一行的意思是把`d/10`的值赋值给 e，由于被除数 d 是浮点型，因此我们可以得到`d/10`的值是浮点型，也就是 1.500000 ，可以直接赋值给 f，所以 f=1.500000。
+ 这一行的意思是把 `d/10` 的值赋值给 f，由于被除数 d 是浮点型，因此我们可以得到 `d/10` 的值是浮点型，也就是 1.500000 ，可以直接赋值给 f，所以 f=1.500000。
 
 ---
 
@@ -417,7 +417,7 @@ int main()
 
 
 -  `e='\141';`
- 数字前面加反斜杠代表这个数是八进制数。这里是把 1418 转换成一个十进制的ASCII码对应的字符，赋值给 e ，所以 e 是 `a`。
+ 数字前面加反斜杠代表这个数是八进制数。这里的 `\141` 表示八进制数 `141`（即十进制 97）对应的 ASCII 字符，赋值给 e ，所以 e 是 `a`。
 
  
 
@@ -482,7 +482,7 @@ int main()
 
 
 - 一个是`putchar();`
- 他可以输出括号里面的字符，比如`putchar(‘K’);`他就会输出`K`。(仅限单个的字符)
+ 他可以输出括号里面的字符，比如`putchar('K');`他就会输出`K`。(仅限单个的字符)
 - 另一个是`getchar();`
  他可以接受你在键盘上敲进来的字符(也叫标准输入)，并且把这个字符作为函数返回值进行返回。
 
@@ -643,24 +643,24 @@ int main()
 {
     double t;
     scanf("%lf",&t);
-    printf("%.2f",(9/5)*(t-32));
+    printf("%.2f",(5/9)*(t-32));
     return 0;
 }
 
 ```
 
 这样写是有问题的！
- 为什么呢，是因为程序在计算`(9/5)`的时候是把他们当整型来计算的，所以`(9/5)` 相当于 1 而不是 1.8。
+ 为什么呢，是因为程序在计算 `(5/9)` 的时候是把它们当整型来计算的，所以 `(5/9)` 相当于 0，而不是浮点数的 0.555...。
 
 
 那么怎么改呢，我这里有两种方法：
 
 
-- 第一种，把` (9/5)` 改成` (9.0/5)`
-- 第二种，把 `(9/5) `改成 `(double)(9/5)`，强制类型转换。
+- 第一种，把 `(5/9)` 改成 `(5.0/9)`
+- 第二种，把 `(5/9)` 改成 `(double)5/9`，强制把其中一个操作数转成浮点型。注意不要写成 `(double)(5/9)`，否则 `5/9` 会先按整型算成 0。
 
-这样子，就能得到 1.8 了。
- 或者，你直接写 `1.8` 也行。
+这样子，就能得到 `5/9` 的浮点结果了。
+ 或者，你直接写 `5.0/9.0` 也行。
 
 
 ---
@@ -728,7 +728,7 @@ int main()
 
  输入格式
 
-三个数由逗句分隔
+三个数由逗号分隔
 
 
  输入样例
@@ -906,7 +906,7 @@ int main()
 
 ```
 
-答案的做法没什么要补充的，32是ASCII码’a’和’A’的差值。
+答案的做法没什么要补充的，32 是 ASCII 码 'a' 和 'A' 的差值。
 
 
  我的做法(直接调用库函数)：
@@ -1076,7 +1076,7 @@ int main()
 
  Description
 
-下面程序是实现一个简单的运算器(保留两位小数点)，如果由键盘输入`10+50`，计算机可以输出结果`60.00`；如果输入`8＊6`，计算机输出`48.00`；如果输入`20/4`，计算机输出`5.00`；如果输入`8-6`，计算机输出`2.00`，请在空处填上适当的代码，运行通过后并提交。
+下面程序是实现一个简单的运算器(保留两位小数点)，如果由键盘输入`10+50`，计算机可以输出结果`60.00`；如果输入`8*6`，计算机输出`48.00`；如果输入`20/4`，计算机输出`5.00`；如果输入`8-6`，计算机输出`2.00`，请在空处填上适当的代码，运行通过后并提交。
 
  ![img](https://i-blog.csdnimg.cn/direct/70eaa2a0292a4024ad73b6ec648dd7f7.png#pic_center)
 
@@ -1142,7 +1142,7 @@ int main()
  输出格式
 
 ```
-Y`或者`N
+Y 或 N
 ```
 
 
@@ -1164,7 +1164,7 @@ Y
 
 ```c
 #include <stdio.h>
-#include "math.h"
+#include <math.h>
 int main()
 {
     int n;
@@ -1326,7 +1326,7 @@ Y
 
 ```c
 #include <stdio.h>
-#include "math.h"
+#include <math.h>
 int main()
 {
     double a,b;
@@ -1932,7 +1932,7 @@ for(int i = 1 ; i <= n ; i ++)
     int kong = n - i + 1;
     int xing = 2*i-1;   
     for(int j = 1 ; j <= kong ; j ++) printf(" ");  
-    for(int b = 1 ; b <= xing ; b ++) printf("*")   
+    for(int b = 1 ; b <= xing ; b ++) printf("*");
     printf("\n");
 }
 
@@ -2680,7 +2680,7 @@ int main()
 #include <stdio.h>
 #include <string.h>
 
-const int N = 1e4;
+#define N 10000
 int a[N],b[N],c[N];
 char s[N];
 
@@ -2996,9 +2996,9 @@ int main()
 { 
     int i, j;
     char a[100];
-    scanf("%s",buf);
-    for(i=0, j=strlen(buf)-1;i<j; i++, j--)
-        if(buf[i]!=buf[j]) break;
+    scanf("%s",a);
+    for(i=0, j=strlen(a)-1;i<j; i++, j--)
+        if(a[i]!=a[j]) break;
     if(i>=j) printf("Y");
     else printf("N");
 }
@@ -4421,7 +4421,7 @@ Yes, you can.bye
 
 ```
 
-(注：因No, you can’t.在bye之后，所以不输出)
+(注：因No, you can't.在bye之后，所以不输出)
  (注：代码中不要使用return及exit()函数，以免误判)
 
 
@@ -4522,7 +4522,7 @@ int main()
 
  Description
 
-在当前目录有文件“case1.in”，文件里存放有多个(总个数不超过10000个)英文单词(每个英文单词不会超过10个字文字符)， 每行一个，单词未排序。现要求，将文件中的所有单词按字典顺序排序，然后将排序好的单词写入新建的文件answer.txt中(注：文件存放于当前目录)。 请完成程序，实现该功能，(注意，填空题，请不要使用return 0结束，否则会影响评判而判错)
+在当前目录有文件“case1.in”，文件里存放有多个(总个数不超过10000个)英文单词(每个英文单词不会超过10个字符)， 每行一个，单词未排序。现要求，将文件中的所有单词按字典顺序排序，然后将排序好的单词写入新建的文件answer.txt中(注：文件存放于当前目录)。 请完成程序，实现该功能，(注意，填空题，请不要使用return 0结束，否则会影响评判而判错)
  (如case1.in文件中原内容如下)
 
 
@@ -4540,7 +4540,9 @@ yes
 bye
 hello
 yes
+```
 
+```c
 #include <stdio.h>
 #include <string.h>
 
@@ -4555,7 +4557,7 @@ int main()
 
 ```c
     char ch[10000][11],a[11];
-    FILE *fp = fopen("case1.in","r")
+    FILE *fp = fopen("case1.in","r");
     FILE *fp1 = fopen("answer.txt","w");
     int i,j,n=0;
     if(fp == NULL) return 0;
@@ -4601,7 +4603,7 @@ $$
 
  输入格式
 
-三个数，分别为货款金额、每月还款和月利率，以空格分隔，均为非负数，其中 \(d，p，r>=0\)
+三个数，分别为贷款金额、每月还款和月利率，以空格分隔，均为非负数，其中 \(d,p,r \ge 0\)
 
  输出格式
 
@@ -4623,10 +4625,10 @@ $$
 
 主要是使用 `if-else`筛去**无法计算**或者**不符合实际**的情况，其余的情况正常计算即可
 
-1. \(1 + r \gt 0\) 时，无法计算，输出 `God`
-2. \(p - d \times r = 0\) 时，该分数无意义，无法计算，输出 `God`
-3. \(p\) 与 \(p - d \times r\) 符号不一致时，\(\frac{p}{p - d \times r} \le 0\) 无法计算，输出 `God` （由于题目给出 p 是非负的 ，只需要判断 \(p\) 是否等于 \(0\) 和 \(p - d \times r\) 是否小于 \(0\) 即可）
-4. 当 \(d = 0\) 时，无需还款，直接输出 `0.0`
+1. 当 \(d = 0\) 时，无需还款，直接输出 `0.0`
+2. 当 \(p = 0\) 时，无法还款，输出 `God`
+3. 当 \(r = 0\) 时，公式分母为 \(\log(1)=0\)，需要单独输出 \(d/p\)
+4. 当 \(p - d \times r \le 0\) 时，分式无意义或无法还清，输出 `God`
 5. 其他情况，直接计算即可
 
  代码
@@ -4643,10 +4645,16 @@ int main() {
     if(d == 0) {
         printf("0.0\n");
     }
-    else if(p - d*r <= 0 || p == 0) {
+    else if(p == 0) {
         printf("God\n");
     }
-    else{
+    else if(r == 0) {
+        printf("%.1f", d / p);
+    }
+    else if(p - d*r <= 0) {
+        printf("God\n");
+    }
+    else {
         printf("%.1f", log10(p/(p-d*r))/log10(1+r));
     }
     
@@ -4843,7 +4851,7 @@ int main() {
  Description
 
 编写程序，输入一个数字字符，输出其前一个和后一个的数字字符，如果输入的是0前一个输出  
-“first”，9后一个则输出“last”，输入的不是数学字符，输出“error”
+“first”，9后一个则输出“last”，输入的不是数字字符，输出“error”
 
  输入格式
 
@@ -5115,7 +5123,7 @@ int main() {
 
 下一个分数的**分母** 等于上一个数的**分子**
 
-下一个数的的**分子** 等于上一个数的**分子和分母的和**
+下一个数的**分子** 等于上一个数的**分子和分母的和**
 
 就这样往下递推计算前 \(n\) 项和即可
 
@@ -5133,9 +5141,10 @@ int main() {
     scanf("%d",&n);
     
     for(int i = 1 ; i <= n ; i ++) {
-        s += up/down;
-        a = a + b;
-        b = a - b;
+        ans += up / down;
+        double next = up + down;
+        down = up;
+        up = next;
     }
     
     printf("%.4f\n",ans);
@@ -5651,31 +5660,33 @@ int main() {
 
  题解
 
-开一个足够大的计数数组（比如包含 \(1000000\) 个元素）
+因为只有 \(10\) 个数，直接用数组保存输入即可。
 
-每次输入就使对应的数组元素 \(+ 1\)
-
-还有在对应数组元素为 \(0\) 时才打印该数字
+输出第 \(i\) 个数之前，检查它是否已经在前面出现过；没出现过才输出。
 
  代码
 
 ```
 #include <stdio.h>
 
-const int N = 1e7;
-int a[N];
-
 int main() {
-    int num;
+    int a[10];
     
     for(int i = 0 ; i < 10 ; i ++) {
-        scanf("%d",&num);
-        
-        if(a[num] == 0) {
-            printf("%d\n",num);
+        scanf("%d", &a[i]);
+    }
+    
+    for(int i = 0 ; i < 10 ; i ++) {
+        int appeared = 0;
+        for(int j = 0 ; j < i ; j ++) {
+            if(a[j] == a[i]) {
+                appeared = 1;
+                break;
+            }
         }
-        
-        a[num] ++;
+        if(!appeared) {
+            printf("%d\n", a[i]);
+        }
     }
     return 0;
 }
@@ -5907,7 +5918,7 @@ Y
 #include <string.h>
 int main() {    
     char a[100];
-    scanf("%s",&a);
+    scanf("%s", a);
     
     int l = strlen(a);
     int left = 0 , right = l-1;
@@ -6014,11 +6025,12 @@ int sum(int n)
     _______________________
 }
 
-main()
+int main()
 {
     int n;
     scanf("%d", &n);
     printf("%d", sum(n));
+    return 0;
 }
 ```
 
@@ -6065,11 +6077,12 @@ int sum(int n)
     return ans;
 }
 
-main()
+int main()
 {
     int n;
     scanf("%d", &n);
     printf("%d", sum(n));
+    return 0;
 }
 ```
 
@@ -6087,12 +6100,13 @@ void yuan(char *s,char *s2)
 _______________________
 }
 
-main()
+int main()
 {
     char str[81], str2[81];
     gets(str);
     yuan(str,str2);
     printf("%s", str2);
+    return 0;
 }
 ```
 
@@ -6151,12 +6165,13 @@ void yuan(char *s,char *s2)
     s2[idx] = '\0';
 }
 
-main()
+int main()
 {
     char str[81], str2[81];
     gets(str);
     yuan(str,str2);
     printf("%s", str2);
+    return 0;
 }
 ```
 
@@ -6228,7 +6243,7 @@ int statistics(char *s)
     int l = strlen(s);
     int res = 0;
     
-    for(int i = 0 ; i < n ; i ++) {
+    for(int i = 0 ; i < l ; i ++) {
         if(s[i] >= '0' && s[i] <= '9') {
             nN ++;
         }
@@ -6755,7 +6770,7 @@ int main()
 
  题解
 
-因为以你那最多也就 \(366\) 天，我们可以从第一天开始遍历计数，直到现在这天就停止遍历计数就可以了  
+因为一年最多也就 \(366\) 天，我们可以从第一天开始遍历计数，直到现在这天就停止遍历计数就可以了  
 比较麻烦的是计算闰年的地方，大家可以看一下我的处理方式
 
  代码
@@ -6907,7 +6922,7 @@ _______________________
 
 因为这是填空题，所以后面出现的关于结构体的变量，你在声明的时候一定要保持 **变量名一致**！
 
-其次，关于排序的算法，这里其实你也改变不了他给你的算法，只能用冒泡排序，结构体可以直接交换就行
+其次，关于排序的算法，这里其实你也改变不了他给你的算法，只能用冒泡排序：平均分高的排前面，平均分相同则学号小的排前面，结构体可以直接交换就行
 
  代码
 
@@ -6928,14 +6943,14 @@ int main()
     struct data stu[10],tmp;
     for(i=0; i<10; i++)
     {
-        scanf("%d%s%lf%lf%lf", &stu[i].num, &stu[i].name, &stu[i].score[0], &stu[i].score[1], &stu[i].score[2]);
+        scanf("%d%s%lf%lf%lf", &stu[i].num, stu[i].name, &stu[i].score[0], &stu[i].score[1], &stu[i].score[2]);
         stu[i].ave = stu[i].score[0] + stu[i].score[1] + stu[i].score[2];
         stu[i].ave /= 3;
     }
     for(i=0; i<9; i++)
         for(j=0; j<9-i; j++)
         {
-            if(stu[j].ave < stu[j + 1].ave) {
+            if(stu[j].ave < stu[j + 1].ave || (stu[j].ave == stu[j + 1].ave && stu[j].num > stu[j + 1].num)) {
                 tmp = stu[j];
                 stu[j] = stu[j + 1];
                 stu[j + 1] = tmp;
@@ -7113,7 +7128,7 @@ display done
 
 **两个数之间只交换一次！**
 
-所以我们只需要判断第二次交换的两个数是不是第一次交换得两个数就可以了
+所以我们只需要判断第二次交换的两个数是不是第一次交换的两个数就可以了
 
 如果是，就直接返回；
 
@@ -7259,7 +7274,7 @@ void find(int a[][4])
         max=*p;
         for(q = *p + 1 ; q < *p + 4; q ++/*方框2*/)
         {
-            if(*max < *q) {*max = *q;} /*方框3*/
+            if(*max < *q) max = q; /*方框3*/
         }
         printf("%d\n", *max);
     }
@@ -7430,11 +7445,10 @@ void print(struct DATA *head)
     }
 }
 
-main()
+int main()
 {
     struct DATA *head, *head2;
     int n;
-    long del_num;
     scanf("%d",&n);
     head=create(n);
     scanf("%d",&n);
@@ -7448,7 +7462,7 @@ main()
  输入格式
 
 第一行一个数 \(n\) ，表示第一个列表的数据个数  
-每二行为 \(n\) 个数  
+第二行为 \(n\) 个数  
 第三行为一个数 \(m\)  
 第四行为 \(m\) 个数
 
@@ -7518,11 +7532,11 @@ struct DATA *create(int n)
 struct DATA *merge(struct DATA *head, struct DATA *head2)
 {
     struct DATA *p;
+    if(head == NULL) return head2;
     p=head;
     while(p->next!=NULL) 
         p=p->next;
     p->next = head2;
-    return head;
     return head;
 }
 
@@ -7556,6 +7570,7 @@ struct DATA *insert(struct DATA *head, struct DATA *d)
 struct DATA *sort(struct DATA *head) 
 {
     struct DATA *p1,*p2;
+    if(head == NULL || head->next == NULL) return head;
     p2=head;p1=head;
     p2=p2->next;
     p1->next=NULL;
@@ -7582,11 +7597,10 @@ void print(struct DATA *head)
     }
 }
 
-main()
+int main()
 {
     struct DATA *head, *head2;
     int n;
-    long del_num;
     scanf("%d",&n);
     head=create(n);
     scanf("%d",&n);
@@ -7594,5 +7608,6 @@ main()
     head = merge(head, head2);
     head = sort(head);
     print(head);
+    return 0;
 }
 ```
