@@ -1,3 +1,13 @@
+---
+title: SCAU 数据结构题目题解
+date: 2026-06-10 15:56:36
+tags:
+  - 数据结构
+  - 华南农业大学
+  - 编程
+mathjax: true
+toc: true
+---
 # SCAU OJ 数据结构
 > 来源：`https://acm.scau.edu.cn/uoj8000/` 数据结构栏目；抓取日期：2026-06-09。
 > 共整理 129 道题。
@@ -13896,3 +13906,4 @@ Hint
 #include <bits/stdc++.h>
 using namespace std;int main(){int N,K,M;cin>>N>>K>>M;vector<vector<pair<int,int>>>g(N+1);for(int i=0,v,u,w;i<M;i++){cin>>v>>u>>w;g[v].push_back({u,w});}const int INF=1e9;vector<int>d(N+1,INF);priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;d[K]=0;pq.push({0,K});while(!pq.empty()){auto [du,u]=pq.top();pq.pop();if(du!=d[u])continue;for(auto [v,w]:g[u])if(d[v]>du+w){d[v]=du+w;pq.push({d[v],v});}}int ans=0;for(int i=1;i<=N;i++){if(d[i]==INF){cout<<-1;return 0;}ans=max(ans,d[i]);}cout<<ans;}
 ```
+
