@@ -345,66 +345,102 @@ Please choose:
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
+#include <stdio.h>
+#include <malloc.h>
 #define OK 1
 #define ERROR 0
-#define LIST_INIT_SIZE 100   // 顺序表初始容量
-#define LISTINCREMENT 10      // 容量不足时每次扩容的增量
-typedef int ElemType;
+#define LIST_INIT_SIZE 100
+#define LISTINCREMENT 10
+#define ElemType int
 
-// 顺序表结构定义：elem 指向动态数组首地址，length 为当前元素个数，listsize 为当前容量
-struct SqList{ ElemType *elem; int length, listsize; };
+typedef struct
+{
+    int *elem;
+    int length;
+    int listsize;
+} SqList;
 
-// 初始化操作：申请可容纳 LIST_INIT_SIZE 个元素的存储空间，构造空表
-int InitList_Sq(SqList &L){
-    L.elem=(ElemType*)malloc(LIST_INIT_SIZE*sizeof(ElemType));
-    if(!L.elem) return ERROR;                 // 内存分配失败，返回错误标志
-    L.length=0; L.listsize=LIST_INIT_SIZE; return OK;
+int InitList_Sq(SqList &L)
+{
+    // 算法2.3，构造一个空的线性表L，该线性表预定义大小为LIST_INIT_SIZE
+    L.elem = (ElemType *)malloc(LIST_INIT_SIZE * sizeof(ElemType));
+    if (!L.elem) return ERROR;
+    L.length = 0;
+    L.listsize = LIST_INIT_SIZE;
+    return OK;
 }
 
-// 遍历输出操作：空表输出提示信息，否则依次打印各元素
-int Load_Sq(SqList &L){
-    if(L.length==0) printf("The List is empty!");
-    else{ printf("The List is: "); for(int i=0;i<L.length;i++) printf("%d ",L.elem[i]); }
-    printf("\n"); return OK;
-}
-
-// 插入操作：在第 i 个位置之前插入元素 e（合法位序 i：1 .. length+1）
-int ListInsert_Sq(SqList &L,int i,int e){
-    if(i<1||i>L.length+1) return ERROR;       // 位序非法，返回错误标志
-    if(L.length>=L.listsize){                 // 存储空间已满，按增量进行扩容
-        ElemType *p=(ElemType*)realloc(L.elem,(L.listsize+LISTINCREMENT)*sizeof(ElemType));
-        if(!p) return ERROR; L.elem=p; L.listsize+=LISTINCREMENT;
+int Load_Sq(SqList &L)
+{
+    // 输出顺序表中的所有元素
+    int i;
+    if (L.length == 0) printf("The List is empty!");
+    else
+    {
+        printf("The List is: ");
+        for (i = 0; i < L.length; i++) printf("%d ", L.elem[i]);
     }
-    for(int k=L.length;k>=i;k--) L.elem[k]=L.elem[k-1]; // 从后向前依次后移，腾出第 i 个位置
-    L.elem[i-1]=e; L.length++; return OK;     // 写入新元素，表长加 1
+    printf("\n");
+    return OK;
 }
 
-// 删除操作：删除第 i 个元素，并通过引用参数 e 返回其值（合法位序 i：1 .. length）
-int ListDelete_Sq(SqList &L,int i,int &e){
-    if(i<1||i>L.length) return ERROR;         // 位序非法，返回错误标志
-    e=L.elem[i-1];                            // 暂存待删元素的值
-    for(int k=i-1;k<L.length-1;k++) L.elem[k]=L.elem[k+1]; // 后继元素整体前移，覆盖空位
-    L.length--; return OK;                    // 表长减 1
+int ListInsert_Sq(SqList &L, int i, int e)
+{
+    // 算法2.4，在顺序线性表L中第i个位置之前插入新的元素e
+    // i的合法值为1≤i≤L.length +1
+    if (i < 1 || i > L.length + 1) return ERROR;
+    if (L.length >= L.listsize)
+    {
+        ElemType *newbase = (ElemType *)realloc(L.elem, (L.listsize + LISTINCREMENT) * sizeof(ElemType));
+        if (!newbase) return ERROR;
+        L.elem = newbase;
+        L.listsize += LISTINCREMENT;
+    }
+    for (int k = L.length - 1; k >= i - 1; k--) L.elem[k + 1] = L.elem[k];
+    L.elem[i - 1] = e;
+    L.length++;
+    return OK;
 }
 
-int main(){
-    SqList T; int a,i,x,e;
-    if(InitList_Sq(T)==OK) printf("A Sequence List Has Created.\n"); // 建表成功
-    while(1){
+int ListDelete_Sq(SqList &L, int i, int &e)
+{
+    // 算法2.5,在顺序线性表L中删除第i个位置的元素，并用e返回其值
+    // i的合法值为1≤i≤L.length
+    if (i < 1 || i > L.length) return ERROR;
+    e = L.elem[i - 1];
+    for (int k = i; k < L.length; k++) L.elem[k - 1] = L.elem[k];
+    L.length--;
+    return OK;
+}
+
+int main()
+{
+    SqList T;
+    int a, i;
+    ElemType e, x;
+    if (InitList_Sq(T) == OK)    // 判断顺序表是否创建成功
+    {
+        printf("A Sequence List Has Created.\n");
+    }
+    while (1)
+    {
         printf("1:Insert element\n2:Delete element\n3:Load all elements\n0:Exit\nPlease choose:\n");
-        if(scanf("%d",&a)!=1) break;          // 读入菜单选项，读取失败则退出循环
-        switch(a){
-            // 选项 1：读入插入位置 i 与元素值 x，依据返回值判断位序是否合法
-            case 1: scanf("%d%d",&i,&x); if(ListInsert_Sq(T,i,x)==ERROR) printf("Insert Error!\n"); else printf("The Element %d is Successfully Inserted!\n",x); break;
-            // 选项 2：读入删除位置 i，被删元素的值由引用参数 e 返回
-            case 2: scanf("%d",&i); if(ListDelete_Sq(T,i,e)==ERROR) printf("Delete Error!\n"); else printf("The Element %d is Successfully Deleted!\n",e); break;
-            case 3: Load_Sq(T); break;         // 选项 3：遍历输出全部元素
-            case 0: return 1;                  // 选项 0：退出程序
+        scanf("%d", &a);
+        switch (a)
+        {
+            case 1: scanf("%d%d", &i, &x);
+                    if (ListInsert_Sq(T, i, x) == ERROR) printf("Insert Error!\n");
+                    else printf("The Element %d is Successfully Inserted!\n", x);
+                    break;
+            case 2: scanf("%d", &i);
+                    if (ListDelete_Sq(T, i, e) == ERROR) printf("Delete Error!\n");
+                    else printf("The Element %d is Successfully Deleted!\n", e);
+                    break;
+            case 3: Load_Sq(T);
+                    break;
+            case 0: return 1;
         }
     }
-    return 0;
 }
 ```
 
@@ -472,7 +508,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 // 打印辅助函数：先输出序列名称（如 "List A:"），再依次输出各元素，元素间以空格分隔
 void print(const char* name,const vector<int>& a){ cout<<name; for(int x:a) cout<<x<<' '; cout<<'\n'; }
@@ -594,7 +631,7 @@ The turned List is:10 9 8 7 6 5 4 3 2 1
 
 **题目要求**：将顺序表中的元素进行原地逆置（即首尾元素依次对调），并输出逆置后的结果。
 
-**解题思路——首尾双指针法**：设置两个指针分别指向数组的首端和尾端，交换两指针所指元素后，同时向中间移动，当两指针相遇时停止。该过程等价于将整个数组前后翻转。参考答案直接使用了 STL 中的 `reverse` 函数实现，其内部原理与首尾双指针法相同。
+**解题思路——首尾双指针法**：在题目给出的顺序表结构基础上，设置两个下标分别指向表头和表尾，交换两端元素后同时向中间移动，当两下标相遇时停止。该过程只在原顺序表空间内完成，不额外开数组。
 
 **算法分析**：仅需遍历数组的前半部分，时间复杂度为 O(n)。
 
@@ -603,13 +640,93 @@ The turned List is:10 9 8 7 6 5 4 3 2 1
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n; cin>>n; vector<int>a(n); for(int&i:a)cin>>i;          // 读入 n 个元素
-    cout<<"The List is:"; for(int x:a) cout<<x<<' '; cout<<"\n"; // 输出逆置前的顺序表
-    reverse(a.begin(),a.end());                                  // 原地逆置整个顺序表（等价于首尾双指针逐步对调）
-    cout<<"The turned List is:"; for(int x:a) cout<<x<<' '; cout<<"\n"; // 输出逆置后的顺序表
+#include <stdio.h>
+#include <malloc.h>
+#define OK 1
+#define ERROR 0
+#define LIST_INIT_SIZE 100
+#define LISTINCREMENT 10
+#define ElemType int
+
+typedef int Status;
+typedef struct
+{
+    int *elem;
+    int length;
+    int listsize;
+} SqList;
+
+Status InitList_Sq(SqList &L)
+{  // 算法2.3
+    L.elem = (ElemType *)malloc(LIST_INIT_SIZE * sizeof(ElemType));
+    if (!L.elem) return ERROR;
+    L.length = 0;
+    L.listsize = LIST_INIT_SIZE;
+    return OK;
+}
+
+Status ListInsert_Sq(SqList &L, int i, ElemType e)
+{  // 算法2.4
+    ElemType *p;
+    if (i < 1 || i > L.length + 1) return ERROR;
+    if (L.length >= L.listsize) {
+        ElemType *newbase = (ElemType *)realloc(L.elem, (L.listsize + LISTINCREMENT) * sizeof(ElemType));
+        if (!newbase) return ERROR;
+        L.elem = newbase;
+        L.listsize += LISTINCREMENT;
+    }
+    ElemType *q = &(L.elem[i - 1]);
+    for (p = &(L.elem[L.length - 1]); p >= q; --p) *(p + 1) = *p;
+    *q = e;
+    ++L.length;
+    return OK;
+}
+
+Status ListDelete_Sq(SqList &L, int i, ElemType &e)
+{  // 算法2.5
+    ElemType *p, *q;
+    if (i < 1 || i > L.length) return ERROR;
+    p = &(L.elem[i - 1]);
+    e = *p;
+    q = L.elem + L.length - 1;
+    for (++p; p <= q; ++p) *(p - 1) = *p;
+    --L.length;
+    return OK;
+}
+
+Status Reverse_Sq(SqList &L)
+{
+    for (int i = 0, j = L.length - 1; i < j; i++, j--)
+    {
+        ElemType t = L.elem[i];
+        L.elem[i] = L.elem[j];
+        L.elem[j] = t;
+    }
+    return OK;
+}
+
+void Load_Sq(SqList L, const char *prefix)
+{
+    printf("%s", prefix);
+    for (int i = 0; i < L.length; i++) printf("%d ", L.elem[i]);
+    printf("\n");
+}
+
+int main()
+{
+    SqList A;
+    int n;
+    ElemType e;
+    InitList_Sq(A);
+    scanf("%d", &n);
+    for (int i = 1; i <= n; i++)
+    {
+        scanf("%d", &e);
+        ListInsert_Sq(A, i, e);
+    }
+    Load_Sq(A, "The List is:");
+    Reverse_Sq(A);
+    Load_Sq(A, "The turned List is:");
     return 0;
 }
 ```
@@ -801,49 +918,119 @@ Please choose:
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
-#define OK 1
+#include <stdio.h>
+#include <malloc.h>
 #define ERROR 0
-typedef int ElemType;
-struct LNode{ int data; LNode *next; };   // 链表结点定义：数据域 data + 指针域 next 指向后继结点
-typedef LNode* LinkList;
-// 建表操作（尾插法）：尾指针 q 始终指向链表末结点，新结点链接于其后，保证元素顺序与输入顺序一致
-int CreateLink_L(LinkList &L,int n){
-    L=new LNode; L->next=NULL; LinkList q=L; // L 为头结点（不存储数据）
-    for(int i=0,e;i<n;i++){ scanf("%d",&e); LinkList p=new LNode{e,NULL}; q->next=p; q=p; }
+#define OK 1
+#define ElemType int
+
+typedef struct LNode
+{
+    int data;
+    struct LNode *next;
+} LNode, *LinkList;
+
+int CreateLink_L(LinkList &L, int n){
+// 创建含有n个元素的单链表
+    LinkList p, q;
+    int i;
+    ElemType e;
+    L = new LNode;
+    L->next = NULL;              // 先建立一个带头结点的单链表
+    q = L;
+    for (i = 0; i < n; i++) {
+        scanf("%d", &e);
+        p = new LNode;  // 生成新结点
+        p->data = e;
+        p->next = NULL;
+        q->next = p;
+        q = p;
+    }
     return OK;
 }
-// 遍历操作：从头结点的后继开始，逐个访问并输出各结点的数据
+
 int LoadLink_L(LinkList &L){
-    LinkList p=L->next;
-    if(p==NULL) printf("The List is empty!");
-    else{ printf("The LinkList is:"); while(p){ printf("%d ",p->data); p=p->next; } }
-    printf("\n"); return OK;
+// 单链表遍历
+    LinkList p = L->next;
+    if (p == NULL) printf("The List is empty!");
+    else
+    {
+        printf("The LinkList is:");
+        while (p != NULL)
+        {
+            printf("%d ", p->data);
+            p = p->next;
+        }
+    }
+    printf("\n");
+    return OK;
 }
-// 插入操作：在第 i 个位置之前插入元素 e（合法位序 i：1 .. length+1）
-int LinkInsert_L(LinkList &L,int i,ElemType e){
-    LinkList p=L; int j=0; while(p&&j<i-1){ p=p->next; j++; }  // 从头结点开始定位到第 i-1 个结点
-    if(!p||j>i-1) return ERROR;                                // 位序非法，返回错误标志
-    LinkList s=new LNode{e,p->next}; p->next=s; return OK;      // 新结点先连接后继，再令前驱指向它
+
+int LinkInsert_L(LinkList &L, int i, ElemType e){
+// 算法2.9
+// 在带头结点的单链线性表L中第i个位置之前插入元素e
+    LinkList p = L, s;
+    int j = 0;
+    while (p && j < i - 1) {
+        p = p->next;
+        ++j;
+    }
+    if (!p || j > i - 1) return ERROR;
+    s = new LNode;
+    s->data = e;
+    s->next = p->next;
+    p->next = s;
+    return OK;
 }
-// 删除操作：删除第 i 个结点，其值通过引用参数 e 返回（合法位序 i：1 .. length）
-int LinkDelete_L(LinkList &L,int i,ElemType &e){
-    LinkList p=L; int j=0; while(p->next&&j<i-1){ p=p->next; j++; } // 定位到第 i-1 个结点
-    if(!p->next||j>i-1) return ERROR;                               // 位序非法，返回错误标志
-    LinkList q=p->next; p->next=q->next; e=q->data; delete q; return OK; // 令前驱跨过被删结点，再回收其内存
+
+int LinkDelete_L(LinkList &L, int i, ElemType &e){
+// 算法2.10
+// 在带头结点的单链线性表L中，删除第i个元素，并用e返回其值
+    LinkList p = L, q;
+    int j = 0;
+    while (p->next && j < i - 1) {
+        p = p->next;
+        ++j;
+    }
+    if (!(p->next) || j > i - 1) return ERROR;
+    q = p->next;
+    p->next = q->next;
+    e = q->data;
+    delete q;
+    return OK;
 }
-int main(){
-    LinkList T; int n,a,i,x,e;
-    printf("Please input the init size of the linklist:\n"); scanf("%d",&n);
-    printf("Please input the %d element of the linklist:\n",n);
-    if(CreateLink_L(T,n)==OK){ printf("A Link List Has Created.\n"); LoadLink_L(T); } // 建表并遍历输出
-    while(1){
+
+int main()
+{
+    LinkList T;
+    int a, n, i;
+    ElemType x, e;
+    printf("Please input the init size of the linklist:\n");
+    scanf("%d", &n);
+    printf("Please input the %d element of the linklist:\n", n);
+    if (CreateLink_L(T, n) == OK)     // 判断链表是否创建成功
+    {
+        printf("A Link List Has Created.\n");
+        LoadLink_L(T);
+    }
+    while (1)
+    {
         printf("1:Insert element\n2:Delete element\n3:Load all elements\n0:Exit\nPlease choose:\n");
-        if(scanf("%d",&a)!=1) break;
-        if(a==1){ scanf("%d%d",&i,&x); if(LinkInsert_L(T,i,x)==ERROR) printf("Insert Error!\n"); else printf("The Element %d is Successfully Inserted!\n",x); }
-        else if(a==2){ scanf("%d",&i); if(LinkDelete_L(T,i,e)==ERROR) printf("Delete Error!\n"); else printf("The Element %d is Successfully Deleted!\n",e); }
-        else if(a==3) LoadLink_L(T); else if(a==0) return 0;
+        scanf("%d", &a);
+        switch (a)
+        {
+            case 1: scanf("%d%d", &i, &x);
+                    if (LinkInsert_L(T, i, x) == ERROR) printf("Insert Error!\n");
+                    else printf("The Element %d is Successfully Inserted!\n", x);
+                    break;
+            case 2: scanf("%d", &i);
+                    if (LinkDelete_L(T, i, e) == ERROR) printf("Delete Error!\n");
+                    else printf("The Element %d is Successfully Deleted!\n", e);
+                    break;
+            case 3: LoadLink_L(T);
+                    break;
+            case 0: return 1;
+        }
     }
 }
 ```
@@ -944,7 +1131,7 @@ List C:12 15 24 31 45 62 75 84 86 96
 
 **题目要求**：将两个非递减有序链表 A、B 合并为一个新的非递减有序链表 C。
 
-**解题思路**：虽然题目以链表形式给出，但合并的本质与第 2 题（合并顺序表）相同，均为**有序归并**算法。使用两个指针分别遍历链表 A 和 B，每次选取当前值较小的元素接入链表 C。参考答案采用 `vector` 存储以简化实现，其算法逻辑与链表版本完全一致。
+**解题思路**：在题目给出的单链表结构基础上进行**有序归并**。使用两个指针分别遍历链表 A 和 B，每次选取当前值较小的结点接到链表 C 的尾部，并移动相应指针。
 
 **链表实现方案**：维护链表 C 的尾指针，每次比较 A、B 当前结点的值，将较小者从原链表中取出并链接至 C 的尾部。当某一链表遍历完毕后，将另一链表的剩余部分直接拼接到 C 的末尾。全程时间复杂度为 O(n+m)，且无需额外创建新结点。
 
@@ -953,20 +1140,112 @@ List C:12 15 24 31 45 62 75 84 86 96
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
-// 打印辅助函数：输出序列名称及各元素，元素间以空格分隔
-void print(const char* s,const vector<int>& a){ cout<<s; for(int x:a) cout<<x<<' '; cout<<'\n'; }
-int main(){
-    // 读入有序序列 A 和 B（题目以链表形式描述，但归并逻辑与顺序表一致，此处使用 vector 简化实现）
-    int n,m; cin>>n; vector<int>A(n); for(int&i:A)cin>>i; cin>>m; vector<int>B(m); for(int&i:B)cin>>i;
-    vector<int>C; int i=0,j=0;
-    while(i<n||j<m){                       // 双指针有序归并：当 A 或 B 中仍有未处理元素时继续
-        // 若 B 已遍历完毕(j==m)，或 A 的当前元素不大于 B 的当前元素，则取 A；否则取 B
-        if(j==m||(i<n&&A[i]<=B[j])) C.push_back(A[i++]);
-        else C.push_back(B[j++]);
+#include <stdio.h>
+#include <malloc.h>
+#define ERROR 0
+#define OK 1
+#define ElemType int
+
+typedef int Status;
+typedef struct LNode
+{
+    int data;
+    struct LNode *next;
+} LNode, *LinkList;
+
+Status ListInsert_L(LinkList &L, int i, ElemType e) {  // 算法2.9
+    LinkList p, s;
+    p = L;
+    int j = 0;
+    while (p && j < i - 1) {
+        p = p->next;
+        ++j;
     }
-    print("List A:",A); print("List B:",B); print("List C:",C); return 0;
+    if (!p || j > i - 1) return ERROR;
+    s = (LinkList)malloc(sizeof(LNode));
+    s->data = e;  s->next = p->next;
+    p->next = s;
+    return OK;
+}
+
+Status ListDelete_L(LinkList &L, int i, ElemType &e) {  // 算法2.10
+    LinkList p, q;
+    p = L;
+    int j = 0;
+    while (p->next && j < i - 1) {
+        p = p->next;
+        ++j;
+    }
+    if (!(p->next) || j > i - 1) return ERROR;
+    q = p->next;
+    p->next = q->next;
+    e = q->data;
+    free(q);
+    return OK;
+}
+
+Status CreateList_L(LinkList &L, int n)
+{
+    L = (LinkList)malloc(sizeof(LNode));
+    L->next = NULL;
+    LinkList r = L;
+    for (int i = 0; i < n; i++)
+    {
+        ElemType e;
+        scanf("%d", &e);
+        LinkList p = (LinkList)malloc(sizeof(LNode));
+        p->data = e;
+        p->next = NULL;
+        r->next = p;
+        r = p;
+    }
+    return OK;
+}
+
+void PrintList(const char *name, LinkList L)
+{
+    printf("%s", name);
+    for (LinkList p = L->next; p != NULL; p = p->next)
+        printf("%d ", p->data);
+    printf("\n");
+}
+
+Status MergeList_L(LinkList A, LinkList B, LinkList &C)
+{
+    C = (LinkList)malloc(sizeof(LNode));
+    LinkList pa = A->next, pb = B->next, pc = C;
+    while (pa && pb)
+    {
+        if (pa->data <= pb->data)
+        {
+            pc->next = pa;
+            pc = pa;
+            pa = pa->next;
+        }
+        else
+        {
+            pc->next = pb;
+            pc = pb;
+            pb = pb->next;
+        }
+    }
+    pc->next = pa ? pa : pb;
+    return OK;
+}
+
+int main()
+{
+    int n, m;
+    LinkList A, B, C;
+    scanf("%d", &n);
+    CreateList_L(A, n);
+    scanf("%d", &m);
+    CreateList_L(B, m);
+    PrintList("List A:", A);
+    PrintList("List B:", B);
+    MergeList_L(A, B, C);
+    PrintList("List C:", C);
+    return 0;
 }
 ```
 
@@ -1579,7 +1858,9 @@ int main() {
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <climits>
+#include <algorithm>
 using namespace std;
 int main(){
     ios::sync_with_stdio(false); cin.tie(nullptr);  // 关闭同步流，加速输入输出
@@ -1653,7 +1934,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <climits>
+#include <algorithm>
 using namespace std;
 int main(){
     ios::sync_with_stdio(false); cin.tie(nullptr);
@@ -1718,7 +2001,7 @@ int main(){
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;
 int main(){
     long long n; cin>>n;
@@ -1825,7 +2108,8 @@ int main()
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 int main(){
     int n,k; cin>>n>>k;
@@ -1907,7 +2191,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
 using namespace std;
 int main(){
     ios::sync_with_stdio(false); cin.tie(nullptr);
@@ -1996,7 +2281,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 int main(){
     int n,m,c; cin>>n>>m>>c;
@@ -2084,7 +2370,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 int main(){
     ios::sync_with_stdio(false); cin.tie(nullptr);
@@ -2891,7 +3178,8 @@ int main()
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <stack>
 using namespace std;
 int main(){
     long long n; cin>>n;
@@ -3544,45 +3832,159 @@ Status StackTraverse(SqStack S)
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
-// 运算符优先级映射：乘除为2，加减为1，其余（如括号）为0
-int pri(char c){ if(c=='+'||c=='-')return 1; if(c=='*'||c=='/')return 2; return 0; }
-// 对两个操作数a、b执行op运算并返回结果
-int calc(int a,int b,char op){ if(op=='+')return a+b; if(op=='-')return a-b; if(op=='*')return a*b; return a/b; }
-int main(){
-    string s; getline(cin,s);
-    stack<int> nums;   // 操作数栈，用于存放运算过程中的操作数
-    stack<char> ops;   // 运算符栈，用于存放待处理的运算符
-    // apply：从栈顶取出运算符和操作数，执行一次运算并将结果压回操作数栈
-    auto apply=[&](){
-        int b=nums.top(); nums.pop();
-        int a=nums.top(); nums.pop();   // 注意操作数顺序：a为先入栈的左操作数，b为后入栈的右操作数
-        char op=ops.top(); ops.pop();
-        nums.push(calc(a,b,op));
-    };
-    for(size_t i=0;i<s.size();){
-        if(isspace((unsigned char)s[i])){ i++; continue; } // 跳过空白字符
-        if(s[i]=='=') break; // 遇到等号，表达式结束
-        if(isdigit((unsigned char)s[i])){ // 读出一个完整的多位数
-            int v=0;
-            while(i<s.size()&&isdigit((unsigned char)s[i])) v=v*10+s[i++]-'0';
-            nums.push(v); // 将多位数压入操作数栈
-        }
-        else if(s[i]=='('){ ops.push(s[i++]); } // 左括号直接入栈，等待匹配的右括号
-        else if(s[i]==')'){ // 右括号：反复计算直到找到匹配的左括号
-            while(!ops.empty()&&ops.top()!='(') apply();
-            if(!ops.empty()) ops.pop(); // 弹出匹配的左括号
-            i++;
-        }
-        else{ // 运算符：先结算栈中优先级不低于当前运算符的部分
-            char op=s[i++];
-            while(!ops.empty()&&pri(ops.top())>=pri(op)) apply();
-            ops.push(op); // 当前运算符入栈
+#include <malloc.h>
+#include <stdio.h>
+#include <ctype.h>
+#define OK 1
+#define ERROR 0
+#define STACK_INIT_SIZE 100 // 存储空间初始分配量
+#define STACKINCREMENT 10 // 存储空间分配增量
+
+typedef int SElemType; // 定义栈元素类型
+typedef int Status; // Status是函数的类型,其值是函数结果状态代码，如OK等
+
+struct SqStack
+{
+    SElemType *base; // 在栈构造之前和销毁之后，base的值为NULL
+    SElemType *top; // 栈顶指针
+    int stacksize; // 当前已分配的存储空间，以元素为单位
+}; // 顺序栈
+
+Status InitStack(SqStack &S)
+{
+    S.base = (SElemType*)malloc(STACK_INIT_SIZE * sizeof(SElemType));
+    if (!S.base) return ERROR;
+    S.top = S.base;
+    S.stacksize = STACK_INIT_SIZE;
+    return OK;
+}
+
+Status Push(SqStack &S, SElemType e)
+{
+    if (S.top - S.base >= S.stacksize)
+    {
+        S.base = (SElemType*)realloc(S.base, (S.stacksize + STACKINCREMENT) * sizeof(SElemType));
+        if (!S.base) return ERROR;
+        S.top = S.base + S.stacksize;
+        S.stacksize += STACKINCREMENT;
+    }
+    *S.top++ = e;
+    return OK;
+}
+
+Status Pop(SqStack &S, SElemType &e)
+{
+    if (S.top == S.base) return ERROR;
+    e = *--S.top;
+    return OK;
+}
+
+Status GetTop(SqStack S, SElemType &e)
+{
+    if (S.top == S.base) return ERROR;
+    e = *(S.top - 1);
+    return OK;
+}
+
+int StackLength(SqStack S)
+{
+    return S.top - S.base;
+}
+
+Status StackTraverse(SqStack S)
+{
+    SElemType *p;
+    p = S.top;
+    if (S.top == S.base) printf("The Stack is Empty!");
+    else
+    {
+        printf("The Stack is: ");
+        p--;
+        while (p >= S.base)
+        {
+            printf("%d ", *p);
+            p--;
         }
     }
-    while(!ops.empty()) apply(); // 将运算符栈中剩余的运算符全部计算完毕
-    cout<<nums.top(); // 操作数栈顶即为表达式的最终结果
+    printf("\n");
+    return OK;
+}
+
+int Priority(char op)
+{
+    if (op == '+' || op == '-') return 1;
+    if (op == '*' || op == '/') return 2;
+    return 0;
+}
+
+int Operate(int a, char op, int b)
+{
+    if (op == '+') return a + b;
+    if (op == '-') return a - b;
+    if (op == '*') return a * b;
+    return a / b;
+}
+
+void Calculate(SqStack &OPND, SqStack &OPTR)
+{
+    SElemType a, b, op;
+    Pop(OPND, b);
+    Pop(OPND, a);
+    Pop(OPTR, op);
+    Push(OPND, Operate(a, (char)op, b));
+}
+
+int main()
+{
+    SqStack OPND, OPTR;
+    InitStack(OPND);
+    InitStack(OPTR);
+    int ch;
+    while ((ch = getchar()) != EOF)
+    {
+        if (ch == ' ' || ch == '\n' || ch == '\t') continue;
+        if (ch == '=') break;
+        if (isdigit(ch))
+        {
+            int num = 0;
+            while (isdigit(ch))
+            {
+                num = num * 10 + ch - '0';
+                ch = getchar();
+            }
+            Push(OPND, num);
+            if (ch == '=') break;
+            if (ch != EOF) ungetc(ch, stdin);
+        }
+        else if (ch == '(')
+        {
+            Push(OPTR, ch);
+        }
+        else if (ch == ')')
+        {
+            SElemType top;
+            GetTop(OPTR, top);
+            while ((char)top != '(')
+            {
+                Calculate(OPND, OPTR);
+                GetTop(OPTR, top);
+            }
+            Pop(OPTR, top); // 弹出左括号
+        }
+        else
+        {
+            SElemType top;
+            while (GetTop(OPTR, top) == OK && (char)top != '(' && Priority((char)top) >= Priority((char)ch))
+                Calculate(OPND, OPTR);
+            Push(OPTR, ch);
+        }
+    }
+    while (StackLength(OPTR) > 0)
+        Calculate(OPND, OPTR);
+    SElemType ans;
+    GetTop(OPND, ans);
+    printf("%d\n", ans);
+    return 0;
 }
 ```
 
@@ -3650,7 +4052,7 @@ c->1->b
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;
 // 将n个盘从柱a移至柱b，柱c作为辅助柱
 void h(int n,char a,char b,char c){
@@ -3775,26 +4177,89 @@ int QueueLength(SqQueue Q)
 
 将所有客户的等待时间累加，最后除以总人数即可得到平均等待时间。
 
-**算法分析**：由于客户数据已按到达时间排序且仅有一个窗口顺序服务，实际无需真正的队列结构，仅需一个 `finish` 变量滚动更新即可。此处"队列"更多体现为题目背景。时间复杂度 O(n)，空间复杂度 O(1)。
+**算法分析**：参考答案保留题目给出的循环队列基本操作，将客户到达时刻和办理耗时依次入队后再按先来先服务顺序出队模拟。每位客户只入队、出队一次，时间复杂度 O(n)，空间复杂度 O(n)。
 
 **注意事项**：时刻值可能较大，建议使用 `long long` 类型存储 `finish` 以避免整数溢出。
 
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
-int main(){
-    int n; cin>>n;
-    double wait=0; // 累计所有客户的等待时间
-    long long finish=0; // 柜台为上一位客户完成服务的时刻
-    for(int i=0;i<n;i++){
-        long long a,t; cin>>a>>t; // 第i位客户：到达时刻a，办理耗时t
-        if(finish<a) finish=a; // 柜台已空闲，从客户到达时刻起开始服务
-        wait += finish-a; // 该客户的等待时间 = 开始服务时刻 - 到达时刻
-        finish += t; // 服务结束，柜台空闲时刻向后推移
+#include <malloc.h>
+#include <stdio.h>
+#include <stdlib.h>
+#define OK 1
+#define ERROR 0
+typedef int Status; // Status是函数的类型,其值是函数结果状态代码，如OK等
+typedef int QElemType;
+#define MAXQSIZE 100 // 最大队列长度(对于循环队列，最大队列长度要减1)
+
+typedef struct
+{
+    QElemType *base; // 初始化的动态分配存储空间
+    int front; // 头指针,若队列不空,指向队列头元素
+    int rear; // 尾指针,若队列不空,指向队列尾元素的下一个位置
+} SqQueue;
+
+Status InitQueue(SqQueue &Q)
+{
+    Q.base = (QElemType*)malloc(MAXQSIZE * sizeof(QElemType));
+    if (!Q.base) exit(1);
+    Q.rear = Q.front = 0;
+    return OK;
+}
+
+Status EnQueue(SqQueue &Q, QElemType e)
+{
+    if ((Q.rear + 1) % MAXQSIZE == Q.front) return ERROR;
+    Q.base[Q.rear] = e;
+    Q.rear = (Q.rear + 1) % MAXQSIZE;
+    return OK;
+}
+
+Status DeQueue(SqQueue &Q, QElemType &e)
+{
+    if (Q.front == Q.rear) return ERROR;
+    e = Q.base[Q.front];
+    Q.front = (Q.front + 1) % MAXQSIZE;
+    return OK;
+}
+
+Status GetHead(SqQueue Q, QElemType &e)
+{
+    if (Q.front == Q.rear) return ERROR;
+    e = Q.base[Q.front];
+    return OK;
+}
+
+int QueueLength(SqQueue Q)
+{
+    return (Q.rear - Q.front + MAXQSIZE) % MAXQSIZE;
+}
+
+int main()
+{
+    int n, arriveTime, serviceTime;
+    SqQueue arrive, service;
+    InitQueue(arrive);
+    InitQueue(service);
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++)
+    {
+        scanf("%d%d", &arriveTime, &serviceTime);
+        EnQueue(arrive, arriveTime);
+        EnQueue(service, serviceTime);
     }
-    printf("%.2f", wait/n); // 计算并输出平均等待时间，保留两位小数
+
+    int finish = 0;
+    double wait = 0;
+    while (DeQueue(arrive, arriveTime) == OK && DeQueue(service, serviceTime) == OK)
+    {
+        if (finish < arriveTime) finish = arriveTime;
+        wait += finish - arriveTime;
+        finish += serviceTime;
+    }
+    printf("%.2f\n", wait / n);
+    return 0;
 }
 ```
 
@@ -3849,7 +4314,7 @@ int main(){
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;
 // 阿克曼函数：严格按照定义的三种情况进行递归计算
 long long A(int m,int n){
@@ -3941,7 +4406,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stack>
 using namespace std;
 int main(){string s; while(getline(cin,s)){ vector<char> mark(s.size(),' '); stack<int> st; for(int i=0;i<(int)s.size();i++){ if(s[i]=='(') st.push(i); else if(s[i]==')'){ if(st.empty()) mark[i]='?'; else st.pop(); }} while(!st.empty()){mark[st.top()]='$'; st.pop();} cout<<s<<"\n"; for(char c:mark) cout<<c; cout<<"\n"; }}
 ```
@@ -4012,7 +4480,9 @@ int main(){string s; while(getline(cin,s)){ vector<char> mark(s.size(),' '); sta
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cctype>
+#include <stack>
 using namespace std;
 int main(){stack<int> st; char c; while(cin.get(c)){ if(c=='@')break; if(isspace((unsigned char)c))continue; if(isdigit((unsigned char)c)) st.push(c-'0'); else{int b=st.top();st.pop();int a=st.top();st.pop(); if(c=='+')st.push(a+b); else if(c=='-')st.push(a-b); else if(c=='*')st.push(a*b); else st.push(a/b);} } cout<<st.top();}
 ```
@@ -4095,7 +4565,9 @@ yes
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <stack>
 using namespace std;
 int main(){int n;cin>>n;vector<int> in(n),out(n);for(int&i:in)cin>>i;for(int&i:out)cin>>i;stack<int> st;int j=0;for(int x:in){st.push(x);while(!st.empty()&&j<n&&st.top()==out[j]){st.pop();j++;}}cout<<(j==n?"yes":"no");}
 ```
@@ -4166,7 +4638,9 @@ top--;//出栈
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 int main(){int n;cin>>n;vector<int>a(n),suf(n+1,0),ans,st;for(int&i:a)cin>>i;for(int i=n-1;i>=0;i--)suf[i]=max(suf[i+1],a[i]);for(int i=0;i<n;i++){st.push_back(a[i]);while(!st.empty()&&st.back()>suf[i+1]){ans.push_back(st.back());st.pop_back();}}for(int i=0;i<n;i++)cout<<ans[i]<<(i+1==n?'\n':' ');}
 ```
@@ -4248,7 +4722,11 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <queue>
+#include <utility>
 using namespace std;int main(){int n,m;cin>>n>>m;vector<string> g(n);for(auto& s:g)cin>>s;queue<pair<int,int>>q;vector<vector<int>>v(n,vector<int>(m));if(g[0][0]=='0'){q.push({0,0});v[0][0]=1;}int d[4][2]={{1,0},{-1,0},{0,1},{0,-1}};while(!q.empty()){auto [x,y]=q.front();q.pop();for(auto &e:d){int nx=x+e[0],ny=y+e[1];if(nx>=0&&nx<n&&ny>=0&&ny<m&&!v[nx][ny]&&g[nx][ny]=='0'){v[nx][ny]=1;q.push({nx,ny});}}}cout<<(v[n-1][m-1]?"yes":"no");}
 ```
 
@@ -4341,7 +4819,7 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;int n,a[15];void dfs(int st,int sum){for(int i=st;i<=n;i++){int s=sum+a[i];cout<<s<<"\n";dfs(i+1,s);}}int main(){cin>>n;for(int i=1;i<=n;i++)cin>>a[i];dfs(1,0);}
 ```
 
@@ -4425,7 +4903,7 @@ using namespace std;int n,a[15];void dfs(int st,int sum){for(int i=st;i<=n;i++){
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;int m,k,sel[15];void dfs(int x,int cnt){if(cnt==k){for(int i=0;i<k;i++)cout<<sel[i]<<(i+1==k?'\n':' ');return;}for(int i=x;i<=m;i++){sel[cnt]=i;dfs(i+1,cnt+1);}}int main(){cin>>m>>k;dfs(1,0);}
 ```
 
@@ -4497,7 +4975,10 @@ using namespace std;int m,k,sel[15];void dfs(int x,int cnt){if(cnt==k){for(int i
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <numeric>
+#include <vector>
 using namespace std;int main(){int n;cin>>n;vector<int>a(n);iota(a.begin(),a.end(),1);do{for(int i=0;i<n;i++)cout<<a[i]<<(i+1==n?'\n':' ');}while(next_permutation(a.begin(),a.end()));}
 ```
 
@@ -4588,7 +5069,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;int n;vector<long long>a;long long tot,best;void dfs(int i,long long x,long long y){if(i==n){if(x==y)best=max(best,x+y);return;}dfs(i+1,x+a[i],y);dfs(i+1,x,y+a[i]);dfs(i+1,x,y);}int main(){int T;cin>>T;while(T--){cin>>n;a.resize(n);tot=0;for(auto&x:a){cin>>x;tot+=x;}best=0;dfs(0,0,0);cout<<tot-best<<"\n";}}
 ```
 
@@ -4664,7 +5147,9 @@ n的全部分解形式，注意分解式中数字值大的排在前面，如第�
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;int n;vector<int> p;void dfs(int rem,int mx){if(rem==0){cout<<n<<"=";for(size_t i=0;i<p.size();i++)cout<<(i?"+":"")<<p[i];cout<<"\n";return;}for(int x=min(rem,mx);x>=1;x--){p.push_back(x);dfs(rem-x,x);p.pop_back();}}int main(){cin>>n;dfs(n,n);}
 ```
 
@@ -4734,7 +5219,7 @@ using namespace std;int n;vector<int> p;void dfs(int rem,int mx){if(rem==0){cout
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;int main(){long long n,m,k;cin>>n>>m>>k;cout<<(k-1)%n+1<<' '<<(k-1)%m+1;}
 ```
 
@@ -4830,7 +5315,10 @@ Source
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <utility>
 using namespace std;int main(){int n;cin>>n;vector<vector<int>>a(n+2,vector<int>(n+2));for(int i=1;i<=n;i++)for(int j=1;j<=n;j++)cin>>a[i][j];queue<pair<int,int>>q;vector<vector<int>>vis(n+2,vector<int>(n+2));q.push({0,0});vis[0][0]=1;int d[4][2]={{1,0},{-1,0},{0,1},{0,-1}};while(!q.empty()){auto [x,y]=q.front();q.pop();for(auto&e:d){int nx=x+e[0],ny=y+e[1];if(nx>=0&&nx<=n+1&&ny>=0&&ny<=n+1&&!vis[nx][ny]&&a[nx][ny]==0){vis[nx][ny]=1;q.push({nx,ny});}}}for(int i=1;i<=n;i++){for(int j=1;j<=n;j++){if(a[i][j]==0&&!vis[i][j])a[i][j]=2;cout<<a[i][j]<<(j==n?'\n':' ');}}}
 ```
 
@@ -4905,7 +5393,11 @@ BFS（广度优先搜索）是求解无权图最短路径的标准算法。BFS �
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <queue>
+#include <utility>
 using namespace std;int main(){int n,m;cin>>n>>m;vector<string>g(n);for(auto&s:g)cin>>s;vector<vector<int>>dist(n,vector<int>(m,-1));queue<pair<int,int>>q;if(g[0][0]=='0'){dist[0][0]=0;q.push({0,0});}int d[4][2]={{1,0},{-1,0},{0,1},{0,-1}};while(!q.empty()){auto [x,y]=q.front();q.pop();for(auto&e:d){int nx=x+e[0],ny=y+e[1];if(nx>=0&&nx<n&&ny>=0&&ny<m&&dist[nx][ny]<0&&g[nx][ny]=='0'){dist[nx][ny]=dist[x][y]+1;q.push({nx,ny});}}}cout<<dist[n-1][m-1];}
 ```
 
@@ -4977,7 +5469,8 @@ using namespace std;int main(){int n,m;cin>>n>>m;vector<string>g(n);for(auto&s:g
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;const long long MOD=1000000007;int main(){int n;cin>>n;vector<long long> row(1,1);for(int i=2;i<=n;i++){row.push_back(1);for(int j=(int)row.size()-2;j>=1;j--)row[j]=(row[j]+row[j-1])%MOD;}for(int i=0;i<n;i++)cout<<row[i]<<(i+1==n?'\n':' ');}
 ```
 
@@ -5055,7 +5548,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <utility>
 using namespace std;int main(){int N;long long L,M,S;cin>>N>>L>>M>>S;vector<pair<long long,long long>> st(N+2);st[0]={0,0};for(int i=1;i<=N;i++)cin>>st[i].first>>st[i].second;st[N+1]={L,0};sort(st.begin(),st.end());const long long INF=4e18;vector<long long>dp(N+2,INF);dp[0]=0;for(int i=0;i<N+2;i++)if(dp[i]<INF)for(int j=i+1;j<N+2&&st[j].first-st[i].first<=M;j++)dp[j]=min(dp[j],dp[i]+st[j].second);cout<<(dp[N+1]<=S?"Yes":"No");}
 ```
 
@@ -5124,7 +5620,7 @@ using namespace std;int main(){int N;long long L,M,S;cin>>N>>L>>M>>S;vector<pair
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;int n,a[25];bool used[25],isP[50];bool dfs(int pos){if(pos==n){return isP[a[n-1]+a[0]];}for(int x=2;x<=n;x++)if(!used[x]&&isP[x+a[pos-1]]){used[x]=1;a[pos]=x;if(dfs(pos+1))return true;used[x]=0;}return false;}int main(){cin>>n;for(int i=2;i<50;i++){isP[i]=1;for(int d=2;d*d<=i;d++)if(i%d==0)isP[i]=0;}a[0]=1;used[1]=1;if(dfs(1)){for(int i=0;i<n;i++)cout<<a[i]<<(i+1==n?'\n':' ');}else cout<<-1;}
 ```
 
@@ -5247,7 +5743,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
 using namespace std;vector<string> g;void draw(int n,int x,int y){if(n==1){g[x][y]='X';return;}int s=1;for(int i=1;i<n-1;i++)s*=3;draw(n-1,x,y);draw(n-1,x,y+2*s);draw(n-1,x+s,y+s);draw(n-1,x+2*s,y);draw(n-1,x+2*s,y+2*s);}int main(){int n;cin>>n;int sz=1;for(int i=1;i<n;i++)sz*=3;g.assign(sz,string(sz,' '));draw(n,0,0);for(auto&s:g){int r=s.size()-1;while(r>=0&&s[r]==' ')r--;cout<<s.substr(0,r+1)<<"\n";}}
 ```
 
@@ -5347,7 +5845,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <utility>
 using namespace std;int main(){int n;cin>>n;vector<vector<int>> sums(4);for(int p=0;p<4;p++){vector<int>a(n);for(int&i:a)cin>>i;for(int m=1;m<(1<<n);m++){int s=0;for(int i=0;i<n;i++)if(m>>i&1)s+=a[i];sums[p].push_back(s);}}vector<pair<int,int>> all;for(int i=0;i<4;i++)for(int x:sums[i])all.push_back({x,i});sort(all.begin(),all.end());int cnt[4]={0},have=0,ans=1e9,l=0;for(int r=0;r<(int)all.size();r++){if(cnt[all[r].second]++==0)have++;while(have==4){ans=min(ans,all[r].first-all[l].first);if(--cnt[all[l].second]==0)have--;l++;}}cout<<ans;}
 ```
 
@@ -5429,7 +5930,11 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <queue>
+#include <tuple>
 using namespace std;int main(){int n,m,x;cin>>n>>m>>x;vector<string>g(n);queue<tuple<int,int,int>>q;int ans=0;for(int i=0;i<n;i++){cin>>g[i];for(int j=0;j<m;j++)if(g[i][j]=='@'){q.push({i,j,0});ans++;}}int d[8][2]={{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};while(!q.empty()){auto [r,c,t]=q.front();q.pop();if(t==x)continue;for(auto&e:d){int nr=r+e[0],nc=c+e[1];if(nr>=0&&nr<n&&nc>=0&&nc<m&&g[nr][nc]=='*'){g[nr][nc]='@';ans++;q.push({nr,nc,t+1});}}}cout<<ans;}
 ```
 # 实验3
@@ -5542,34 +6047,51 @@ NEXT J is:01231234
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
+#include <stdio.h>
+#include <stdlib.h>
+#define MAXSTRLEN 255                   // 用户可在255以内定义最大串长
+typedef unsigned char SString[MAXSTRLEN + 1]; // 0号单元存放串的长度
 
-int main() {
-    int n;
-    cin >> n;
-    string s;
-    getline(cin, s); // 读取第一行末尾的换行符
-    while (n--) {
-        getline(cin, s);
-        int m = s.size();
-        vector<int> ne(m + 1);
-        ne[1] = 0; // 第一个字符的 next 值为 0
-        int j = 1, k = 0;
-        while (j < m) {
-            if (k == 0 || s[j - 1] == s[k - 1]) {
-                // 字符匹配成功，next 值递增
-                ne[++j] = ++k;
-            } else {
-                // 失配，回溯到更短的前缀继续尝试
-                k = ne[k];
-            }
+void get_next(SString T, int next[]){
+// 算法4.7
+// 求模式串T的next函数值并存入数组next
+    int i = 1, j = 0;
+    next[1] = 0;
+    while (i < T[0])
+    {
+        if (j == 0 || T[i] == T[j])
+        {
+            ++i;
+            ++j;
+            next[i] = j;
         }
-        cout << "NEXT J is:";
-        for (int i = 1; i <= m; i++)
-            cout << ne[i];
-        cout << "\n";
+        else j = next[j];
     }
+}
+
+int main(){
+    int next[MAXSTRLEN + 1];
+    SString S;
+    int n, i, j;
+    int ch;
+    scanf("%d", &n);    // 指定要验证NEXT值的字符串个数
+    getchar();
+    for (i = 1; i <= n; i++)
+    {
+        ch = getchar();
+        for (j = 1; j <= MAXSTRLEN && ch != '\n' && ch != EOF; j++)    // 录入字符串
+        {
+            S[j] = (unsigned char)ch;
+            ch = getchar();
+        }
+        S[0] = j - 1;    // S[0]用于存储字符串中字符个数
+        get_next(S, next);
+        printf("NEXT J is:");
+        for (j = 1; j <= S[0]; j++)
+            printf("%d", next[j]);
+        printf("\n");
+    }
+    return 0;
 }
 ```
 
@@ -5711,46 +6233,82 @@ of
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
+#include <stdio.h>
+#include <stdlib.h>
+#define TRUE 1
+#define FALSE 0
+#define OK 1
+#define ERROR 0
+#define INFEASLBLE -1
+#define OVERFLOW -2
+#define MAXSTRLEN 255     // 用户可在255以内定义最大串长
+typedef unsigned char SString[MAXSTRLEN + 1]; // 0号单元存放串的长度
 
-// 计算模式串 t 的 next 数组
-vector<int> getnext(const string& t) {
-    int m = t.size();
-    vector<int> ne(m + 1);
-    int j = 1, k = 0;
-    while (j < m) {
-        if (k == 0 || t[j - 1] == t[k - 1])
-            ne[++j] = ++k; // 字符匹配，next 值递增
-        else
-            k = ne[k];      // 失配，回溯到更短的前缀
-    }
-    return ne;
-}
-
-// KMP 模式匹配：返回模式串在主串中的起始位置（1-based），未找到返回 0
-int kmp(const string& s, const string& t) {
-    auto ne = getnext(t);
-    int i = 1, j = 1;          // i 为主串指针，j 为模式串指针
-    int n = s.size(), m = t.size();
-    while (i <= n && j <= m) {
-        if (j == 0 || s[i - 1] == t[j - 1]) {
-            i++; j++;          // 匹配成功，双指针同步后移
-        } else {
-            j = ne[j];         // 失配，模式串指针回溯，主串指针不动
+void get_next(SString T, int next[]){
+// 算法4.7
+// 求模式串T的next函数值并存入数组next
+    int i = 1, j = 0;
+    next[1] = 0;
+    while (i < T[0])
+    {
+        if (j == 0 || T[i] == T[j])
+        {
+            ++i;
+            ++j;
+            next[i] = j;
         }
+        else j = next[j];
     }
-    return j > m ? i - m : 0;  // 匹配成功返回起始位置，否则返回 0
 }
 
-int main() {
-    int n;
-    cin >> n;
-    string s, t;
-    while (n--) {
-        cin >> s >> t;
-        cout << kmp(s, t) << "\n";
+int Index_KMP(SString S, SString T, int pos){
+// 算法4.6
+// 利用模式串T的next函数求T在主串S中第pos个字符之后的位置
+// KMP算法。
+    int i = pos, j = 1;
+    int next[MAXSTRLEN + 1];
+    get_next(T, next);
+    while (i <= S[0] && j <= T[0])
+    {
+        if (j == 0 || S[i] == T[j])
+        {
+            ++i;
+            ++j;
+        }
+        else j = next[j];
     }
+    if (j > T[0]) return i - T[0];
+    return 0;
+}
+
+int main()
+{
+    SString T, S;
+    int i, j, n;
+    int ch;
+    int pos;
+    scanf("%d", &n);    // 指定n对需进行模式匹配的字符串
+    getchar();
+    for (j = 1; j <= n; j++)
+    {
+        ch = getchar();
+        for (i = 1; i <= MAXSTRLEN && ch != '\n' && ch != EOF; i++)    // 录入主串
+        {
+            S[i] = (unsigned char)ch;
+            ch = getchar();
+        }
+        S[0] = i - 1;    // S[0]用于存储主串中字符个数
+        ch = getchar();
+        for (i = 1; i <= MAXSTRLEN && ch != '\n' && ch != EOF; i++)    // 录入模式串
+        {
+            T[i] = (unsigned char)ch;
+            ch = getchar();
+        }
+        T[0] = i - 1;    // T[0]用于存储模式串中字符个数
+        pos = Index_KMP(S, T, 1);
+        printf("%d\n", pos);
+    }
+    return 0;
 }
 ```
 
@@ -5834,7 +6392,8 @@ int main() {
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 
 struct T {
@@ -5957,7 +6516,9 @@ int main() {
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
 int main() {
@@ -6053,7 +6614,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cctype>
+#include <string>
 using namespace std;
 
 int main() {
@@ -6157,7 +6720,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <string>
 using namespace std;
 
 int main() {
@@ -6246,7 +6811,9 @@ ababab
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
 using namespace std;
 
 int main() {
@@ -6358,7 +6925,9 @@ HGBCACABCACABCACAF
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cctype>
+#include <string>
 using namespace std;
 
 string s;
@@ -6475,7 +7044,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
 using namespace std;
 
 // 判断 s[l..n-1] 是否为回文串
@@ -6587,7 +7157,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cstdio>
+#include <vector>
 using namespace std;
 
 int main() {
@@ -6733,7 +7305,8 @@ for(i=0;i<=2;i++)
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
 using namespace std;
 
 // 检查子串是否构成合法的 IP 地址段
@@ -6884,55 +7457,70 @@ BCA
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;
+#include <stdio.h>
+#include <malloc.h>
+#define TRUE 1
+#define FALSE 0
+#define OK 1
+#define ERROR 0
+#define INFEASIBLE -1
+#define OVERFLOW -2
+typedef int Status;
 
-// 二叉树结点定义
-struct Node {
-    char v;       // 结点值
-    Node *l, *r;  // 左、右子树指针
-};
+typedef char ElemType;
+typedef struct BiTNode{
+    ElemType data;
+    struct BiTNode *lchild, *rchild; // 左右孩子指针
+} BiTNode, *BiTree;
 
-// 按先序序列递归建树，'#' 表示空结点
-Node* build() {
-    char c;
-    if (!(cin >> c)) return nullptr;  // 输入结束
-    if (c == '#') return nullptr;     // 空结点，返回空指针
-    return new Node{c, build(), build()};  // 创建根结点，递归构建左、右子树
-}
-
-// 先序遍历：根 → 左 → 右
-void pre(Node* t) {
-    if (t) {
-        cout << t->v;
-        pre(t->l);
-        pre(t->r);
+Status CreateBiTree(BiTree &T) {  // 算法6.4
+    char ch;
+    scanf("%c", &ch);
+    if (ch == '#') T = NULL;
+    else {
+        if (!(T = (BiTNode *)malloc(sizeof(BiTNode)))) return ERROR;
+        T->data = ch;              // 生成根结点
+        CreateBiTree(T->lchild);   // 构造左子树
+        CreateBiTree(T->rchild);   // 构造右子树
     }
+    return OK;
 }
 
-// 中序遍历：左 → 根 → 右
-void in(Node* t) {
-    if (t) {
-        in(t->l);
-        cout << t->v;
-        in(t->r);
+Status PreOrderTraverse(BiTree T) {
+    if (T) {
+        printf("%c", T->data);
+        PreOrderTraverse(T->lchild);
+        PreOrderTraverse(T->rchild);
     }
+    return OK;
 }
 
-// 后序遍历：左 → 右 → 根
-void post(Node* t) {
-    if (t) {
-        post(t->l);
-        post(t->r);
-        cout << t->v;
+Status InOrderTraverse(BiTree T) {
+    if (T) {
+        InOrderTraverse(T->lchild);
+        printf("%c", T->data);
+        InOrderTraverse(T->rchild);
     }
+    return OK;
 }
 
-int main() {
-    Node* t = build();  // 构建二叉树
-    pre(t);  cout << "\n";   // 输出先序遍历结果
-    in(t);   cout << "\n";   // 输出中序遍历结果
-    post(t); cout << "\n";   // 输出后序遍历结果
+Status PostOrderTraverse(BiTree T) {
+    if (T) {
+        PostOrderTraverse(T->lchild);
+        PostOrderTraverse(T->rchild);
+        printf("%c", T->data);
+    }
+    return OK;
+}
+
+int main()
+{
+    BiTree T;
+    CreateBiTree(T);
+    PreOrderTraverse(T);  printf("\n");
+    InOrderTraverse(T);   printf("\n");
+    PostOrderTraverse(T); printf("\n");
+    return 0;
 }
 ```
 
@@ -7033,7 +7621,7 @@ ABC###D##
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;
 
 struct Node {
@@ -7137,7 +7725,10 @@ int main() {
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <queue>
 using namespace std;
 
 int main() {
@@ -7231,7 +7822,8 @@ cbeda
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
 using namespace std;
 
 string pre, in;  // 先序序列和中序序列
@@ -7326,7 +7918,9 @@ int main() {
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
 int ans = 0;                  // 记录全局最大直径
@@ -7489,58 +8083,103 @@ int main()
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <stdio.h>
+#include <string.h>
 using namespace std;
+typedef struct
+{
+    unsigned int weight;
+    unsigned int parent, lchild, rchild;
+} HTNode, *HuffmanTree;
+typedef char **HuffmanCode;
 
-// 哈夫曼树结点结构
-struct Node {
-    int w;   // 权值
-    int p;   // 父结点编号，0 表示无父结点
-    int l;   // 左孩子编号
-    int r;   // 右孩子编号
-};
-
-int main() {
-    int n;
-    cin >> n;
-    vector<Node> ht(2 * n);  // 哈夫曼树数组，下标 1~2n-1
+void select(HuffmanTree &HT, int n, int &s1, int &s2)
+{// 在HT[1..n]中选择parent为0且weight最小的两个结点，序号分别为s1（最小）和s2（次小）。
+    s1 = s2 = 0;
     for (int i = 1; i <= n; i++)
-        cin >> ht[i].w;  // 读入 n 个叶子结点的权值
-
-    if (n == 1) {
-        cout << 0;  // 特殊情况：仅一个叶子结点
-        return 0;
-    }
-
-    // 构建哈夫曼树：执行 n-1 次合并
-    for (int i = n + 1; i <= 2 * n - 1; i++) {
-        int s1 = 0, s2 = 0;  // s1 为最小权值下标，s2 为次小权值下标
-        for (int j = 1; j < i; j++) {
-            if (!ht[j].p) {  // 仅考虑尚未合并的结点
-                if (!s1 || ht[j].w < ht[s1].w) {
-                    s2 = s1; s1 = j;
-                } else if (!s2 || ht[j].w < ht[s2].w) {
-                    s2 = j;
-                }
-            }
+    {
+        if (HT[i].parent != 0) continue;
+        if (s1 == 0 || HT[i].weight < HT[s1].weight)
+        {
+            s2 = s1;
+            s1 = i;
         }
-        // 合并 s1 和 s2，生成新的内部结点 i
-        ht[s1].p = ht[s2].p = i;
-        ht[i].l = s1;
-        ht[i].r = s2;
-        ht[i].w = ht[s1].w + ht[s2].w;
-    }
-
-    // 从叶子到根逆向生成哈夫曼编码
-    for (int i = 1; i <= n; i++) {
-        string c;
-        for (int x = i, f = ht[x].p; f; x = f, f = ht[x].p) {
-            // 若当前结点是父结点的左孩子则编 '0'，否则编 '1'
-            c.push_back(ht[f].l == x ? '0' : '1');
+        else if (s2 == 0 || HT[i].weight < HT[s2].weight)
+        {
+            s2 = i;
         }
-        reverse(c.begin(), c.end());  // 逆序得到正确编码
-        cout << c << "\n";
     }
+}
+
+void createHuffmanTree(HuffmanTree &HT, int n)
+{ // 构造哈夫曼树HT
+    int i, m, s1, s2;
+    if (n <= 0) return;
+    m = 2 * n - 1;
+    HT = new HTNode[m + 1];
+    for (i = 1; i <= m; i++)
+    {
+        HT[i].weight = 0;
+        HT[i].parent = HT[i].lchild = HT[i].rchild = 0;
+    }
+    for (i = 1; i <= n; i++)
+        scanf("%u", &HT[i].weight);
+    for (i = n + 1; i <= m; i++)    // 建哈夫曼树
+    {
+        select(HT, i - 1, s1, s2);
+        if (HT[s1].weight > HT[s2].weight)
+        {
+            int t = s1;
+            s1 = s2;
+            s2 = t;
+        }
+        HT[s1].parent = HT[s2].parent = i;
+        HT[i].lchild = s1;
+        HT[i].rchild = s2;
+        HT[i].weight = HT[s1].weight + HT[s2].weight;
+    }
+}
+
+void createHuffmanCode(HuffmanTree HT, HuffmanCode &HC, int n)
+{// --- 从叶子到根逆向求每个字符的哈夫曼编码 ---
+    if (n == 1)
+    {
+        HC[1] = new char[2];
+        strcpy(HC[1], "0");
+        return;
+    }
+    char *cd = new char[n];    // 分配求编码的工作空间
+    cd[n - 1] = '\0';  // 编码结束符。
+    int i, c, f, start;
+    for (i = 1; i <= n; ++i)
+    {
+        start = n - 1;
+        c = i, f = HT[i].parent;
+        while (f) // 从叶子到根逆向求编码
+        {
+            --start;
+            if (HT[f].lchild == c) cd[start] = '0';
+            else cd[start] = '1';
+            c = f, f = HT[f].parent;
+        }
+        HC[i] = new char[n - start]; // 为第i个字符编码分配空间
+        strcpy(HC[i], &cd[start]);    // 从cd复制编码(串)到HC
+    }
+    delete[] cd;
+}
+
+int main()
+{
+    int i, n;
+    HuffmanTree HT;
+    HuffmanCode HC;
+    scanf("%d", &n);  // 权值个数
+    HC = new char*[n + 1]; // 0空间未用
+    createHuffmanTree(HT, n);
+    createHuffmanCode(HT, HC, n);
+    for (i = 1; i <= n; i++)
+        printf("%s\n", HC[i]);  // 输出哈夫曼编码
+    return 0;
 }
 ```
 
@@ -7618,7 +8257,8 @@ Source
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
 using namespace std;
 
 string s;  // 输入的 "01" 字符串
@@ -7743,7 +8383,7 @@ ABC###D##
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;
 
 struct Node {
@@ -7850,7 +8490,10 @@ D
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <vector>
 using namespace std;
 
 int main() {
@@ -7987,7 +8630,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <queue>
 using namespace std;
 
 struct Node {
@@ -8103,7 +8747,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
 using namespace std;
 
 int main() {
@@ -8195,7 +8841,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <functional>
+#include <string>
 using namespace std;
 
 int main() {
@@ -8305,7 +8954,11 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <functional>
+#include <vector>
+#include <utility>
 using namespace std;
 
 int main() {
@@ -8431,7 +9084,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cstring>
+#include <climits>
+#include <algorithm>
 using namespace std;
 
 int n;
@@ -8579,7 +9235,8 @@ The element position is 3.
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;int main(){int n;cin>>n;vector<int>a(n+1);for(int i=1;i<=n;i++)cin>>a[i];int key;cin>>key;for(int i=1;i<=n;i++)if(a[i]==key){cout<<"The element position is "<<i<<".";return 0;}cout<<"The element is not exist.";}
 ```
 
@@ -8647,7 +9304,8 @@ The element position is 2.
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;int main(){int n;cin>>n;vector<int>a(n);for(int&i:a)cin>>i;int key;cin>>key;int l=0,r=n-1;while(l<=r){int m=(l+r)/2;if(a[m]==key){cout<<"The element position is "<<m<<".";return 0;}if(a[m]<key)l=m+1;else r=m-1;}cout<<"The element is not exist.";}
 ```
 
@@ -8810,8 +9468,101 @@ Average search length=2.000000
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;int main(){int len;cin>>len;vector<int>h(len,-1);vector<int>probe;int x;while(cin>>x&&x!=-1){int p=(3*x)%len,c=1;while(h[p]!=-1){p=(p+1)%len;c++;}h[p]=x;probe.push_back(c);}for(int i=0;i<len;i++){if(i)cout<<' '; if(h[i]==-1)cout<<'X';else cout<<h[i];}double avg=0;for(int c:probe)avg+=c;printf("\nAverage search length=%.6f",probe.empty()?0:avg/probe.size());}
+#include <malloc.h> /* malloc()等 */
+#include <stdlib.h> /* exit() */
+#include <stdio.h>
+#define EQ(a,b) ((a)==(b))
+#define SUCCESS 1
+#define UNSUCCESS 0
+#define NULLKEY -1 /* 哈希表无元素时值为-1 */
+typedef int ElemType;
+int length;
+typedef struct
+{
+    ElemType *elem; /* 数据元素存储基址，动态分配数组 */
+    int count; /* 当前数据元素个数 */
+} HashTable;
+
+void InitHashTable(HashTable *H)
+{ /* 操作结果: 构造一个长度为length的哈希表,length为全局变量 */
+    int i;
+    (*H).count = 0;
+    (*H).elem = (ElemType*)malloc(length * sizeof(ElemType));
+    if (!(*H).elem)
+        exit(0);
+    for (i = 0; i < length; i++)
+        (*H).elem[i] = NULLKEY;
+}
+
+unsigned Hash(ElemType K)
+{ /* 一个简单的哈希函数 */
+    return (3 * K) % length;
+}
+
+void collision(int *p) /* 线性探测再散列 */
+{ /* 开放定址法处理冲突 */
+    *p = (*p + 1) % length;
+}
+
+int SearchHash(HashTable H, ElemType K, int *p, int *c)
+{  /* 在开放定址哈希表H中查找关键码为K的元素 */
+    *p = Hash(K);
+    while (H.elem[*p] != NULLKEY && !EQ(K, H.elem[*p]))
+    {
+        (*c)++;
+        if (*c < length)
+            collision(p);
+        else
+            break;
+    }
+    if EQ(K, H.elem[*p])
+        return SUCCESS;
+    else
+        return UNSUCCESS;
+}
+
+int InsertHash(HashTable *H, ElemType e)
+{ /* 查找不成功时插入数据元素e到开放定址哈希表H中，并返回查找长度 */
+    int c, p;
+    c = 0;
+    if (SearchHash(*H, e, &p, &c))
+        printf("哈希表中已有元素%d。\n", e);
+    else{
+        (*H).elem[p] = e;
+        ++(*H).count;
+    }
+    return c + 1;
+}
+
+void TraverseHash(HashTable H)
+{ /* 按哈希地址的顺序打印哈希表，无元素位置用X表示 */
+    int i;
+    for (i = 0; i < length; i++)
+        if (H.elem[i] == NULLKEY)
+            printf("X ");
+        else
+            printf("%d ", H.elem[i]);
+    printf("\n");
+}
+
+int main()
+{
+    float i = 0, j = 0;
+    ElemType e;
+    HashTable H;
+    scanf("%d", &length);
+    InitHashTable(&H);
+    scanf("%d", &e);
+    while (e != -1)
+    {
+        j++;
+        i = i + InsertHash(&H, e);
+        scanf("%d", &e);
+    }
+    TraverseHash(H);
+    printf("Average search length=%f\n", i / j);
+    return 0;
+}
 ```
 
 ## 74. 8608 实现二叉排序树的各种算法(2)
@@ -8924,7 +9675,11 @@ using namespace std;int main(){int len;cin>>len;vector<int>h(len,-1);vector<int>
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <stack>
+#include <queue>
 using namespace std;struct N{int v;N*l,*r;N(int x):v(x),l(0),r(0){}};void ins(N*&t,int x){if(!t)t=new N(x);else if(x<t->v)ins(t->l,x);else ins(t->r,x);}bool findx(N*t,int x){return t&&(t->v==x||findx(x<t->v?t->l:t->r,x));}void outv(vector<int>v){for(int i=0;i<v.size();i++)cout<<v[i]<<(i+1==v.size()?'\n':' ');}void pre(N*t,vector<int>&v){if(t){v.push_back(t->v);pre(t->l,v);pre(t->r,v);}}void in(N*t,vector<int>&v){if(t){in(t->l,v);v.push_back(t->v);in(t->r,v);}}void post(N*t,vector<int>&v){if(t){post(t->l,v);post(t->r,v);v.push_back(t->v);}}void show(N*t,int tp){vector<int>v;if(tp==0)pre(t,v);else if(tp==1)in(t,v);else post(t,v);outv(v);}void inorder2(N*t){vector<int>v;stack<N*>s;while(t||!s.empty()){while(t){s.push(t);t=t->l;}t=s.top();s.pop();v.push_back(t->v);t=t->r;}outv(v);}void level(N*t){vector<int>v;queue<N*>q;if(t)q.push(t);while(!q.empty()){auto u=q.front();q.pop();v.push_back(u->v);if(u->l)q.push(u->l);if(u->r)q.push(u->r);}outv(v);}void swp(N*t){if(t){swap(t->l,t->r);swp(t->l);swp(t->r);}}int dep(N*t){return t?max(dep(t->l),dep(t->r))+1:0;}int leaf(N*t){return t?(!t->l&&!t->r)+leaf(t->l)+leaf(t->r):0;}int main(){int n,x;cin>>n;N*root=0;while(n--){cin>>x;ins(root,x);}show(root,0);show(root,1);show(root,2);cin>>x;cout<<findx(root,x)<<"\n";cin>>x;cout<<findx(root,x)<<"\n";cin>>x;ins(root,x);show(root,0);show(root,1);show(root,2);inorder2(root);level(root);swp(root);show(root,0);show(root,1);show(root,2);swp(root);show(root,0);show(root,1);show(root,2);cout<<dep(root)<<"\n"<<leaf(root)<<"\n";}
 ```
 
@@ -9002,7 +9757,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;int main(){ios::sync_with_stdio(false);cin.tie(nullptr);int n;cin>>n;vector<int>a(n);for(int&i:a)cin>>i;int q,x;cin>>q;while(q--){cin>>x;cout<<lower_bound(a.begin(),a.end(),x)-a.begin()+1<<"\n";}}
 ```
 
@@ -9068,7 +9825,7 @@ using namespace std;int main(){ios::sync_with_stdio(false);cin.tie(nullptr);int 
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;long long need(long long x,int n){long long s=0;while(n--){s+=x;x=(x+1)/2;}return s;}int main(){int n;long long m;cin>>n>>m;long long l=1,r=m,ans=1;while(l<=r){long long mid=(l+r)/2;if(need(mid,n)<=m)ans=mid,l=mid+1;else r=mid-1;}cout<<ans;}
 ```
 
@@ -9144,7 +9901,9 @@ using namespace std;long long need(long long x,int n){long long s=0;while(n--){s
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;int main(){ios::sync_with_stdio(false);cin.tie(nullptr);int n;long long m;cin>>n>>m;vector<long long>a(n);long long hi=0;for(auto&x:a){cin>>x;hi=max(hi,x);}long long l=0,ans=0;while(l<=hi){long long mid=(l+hi)/2,sum=0;for(long long x:a)if(x>mid)sum+=x-mid;if(sum>=m)ans=mid,l=mid+1;else hi=mid-1;}cout<<ans;}
 ```
 
@@ -9218,7 +9977,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;int main(){int n,k;cin>>n>>k;vector<int>a(n+1);a[0]=0;for(int i=1;i<=n;i++)cin>>a[i];auto ok=[&](int d){int days=0,pos=0;while(pos<n){int nxt=pos;while(nxt+1<=n&&a[nxt+1]-a[pos]<=d)nxt++;if(nxt==pos)return false;pos=nxt;days++;}return days<=k;};int l=0,r=a[n],ans=r;while(l<=r){int m=(l+r)/2;if(ok(m))ans=m,r=m-1;else l=m+1;}cout<<ans;}
 ```
 
@@ -9295,7 +10055,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;int main(){int n;long long a,b;cin>>n>>a>>b;vector<long long>h(n);for(auto&x:h)cin>>x;auto ok=[&](long long t){long long need=0,extra=max(0LL,a);for(long long x:h){long long rem=x-b*t;if(rem>0){if(extra==0)return false;need+=(rem+extra-1)/extra;if(need>t)return false;}}return need<=t;};long long l=0,r=1;while(!ok(r))r*=2;while(l<=r){long long m=(l+r)/2;if(ok(m))r=m-1;else l=m+1;}cout<<l;}
 ```
 
@@ -9364,7 +10126,7 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
 using namespace std;const long long MOD=1000000007;long long modpow(long long a,long long e){long long r=1%MOD;for(a%=MOD;e;e>>=1,a=a*a%MOD)if(e&1)r=r*a%MOD;return r;}int main(){long long n,m;cin>>n>>m;long long total=modpow(m,n);long long good=(m%MOD)*modpow(m-1,n-1)%MOD;cout<<(total-good+MOD)%MOD;}
 ```
 
@@ -9433,7 +10195,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;int main(){int n,c;cin>>n>>c;vector<long long>cnt(20005);for(int i=0,x;i<n;i++){cin>>x;cnt[x]++;}long long ans=0;for(int i=0;i+c<(int)cnt.size();i++)ans+=cnt[i]*cnt[i+c];cout<<ans;}
 ```
 
@@ -9503,7 +10266,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <unordered_map>
 using namespace std;int main(){int n;long long c,x;cin>>n>>c;unordered_map<long long,long long> mp;for(int i=0;i<n;i++){cin>>x;mp[x]++;}long long ans=0;for(auto [v,cnt]:mp)if(mp.count(v+c))ans+=cnt*mp[v+c];cout<<ans;}
 ```
 
@@ -9572,7 +10336,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <unordered_map>
 using namespace std;int main(){ios::sync_with_stdio(false);cin.tie(nullptr);int n;cin>>n;unordered_map<long long,int> last;int l=1,ans=0;for(int r=1;r<=n;r++){long long x;cin>>x;if(last[x]>=l)l=last[x]+1;last[x]=r;ans=max(ans,r-l+1);}cout<<ans;}
 ```
 
@@ -9641,7 +10407,11 @@ n个整数组成的序列，请输出所有元素左侧与它值最为接近的�
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cstdlib>
+#include <algorithm>
+#include <iterator>
+#include <set>
 using namespace std;int main(){int n;cin>>n;multiset<long long>s;for(int i=0;i<n;i++){long long x;cin>>x;if(i==0){cout<<x;s.insert(x);continue;}auto it=s.lower_bound(x);long long best; if(it==s.begin())best=*it; else if(it==s.end())best=*prev(it); else{long long a=*prev(it),b=*it;best=(llabs(x-b)<=llabs(x-a)?b:a);}cout<<' '<<best;s.insert(x);} }
 ```
 
@@ -9717,7 +10487,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <set>
 using namespace std;int main(){int n;cin>>n;vector<int>A(n),B(n);multiset<int>S;for(int&i:A)cin>>i;for(int i=0,x;i<n;i++){cin>>x;S.insert(x);}for(int i=0;i<n;i++){auto it=S.lower_bound((n-A[i])%n);if(it==S.end())it=S.begin();int v=(A[i]+*it)%n;S.erase(it);cout<<v<<(i+1==n?'\n':' ');}}
 ```
 
@@ -9795,7 +10568,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <iterator>
+#include <string>
+#include <set>
 using namespace std;int main(){string s;int k;cin>>s>>k;set<string> st;int n=s.size();for(int i=0;i<n;i++)for(int len=1;len<=5&&i+len<=n;len++)st.insert(s.substr(i,len));auto it=st.begin();advance(it,k-1);cout<<*it;}
 ```
 
@@ -9885,7 +10661,12 @@ Twin snowflakes found.
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <climits>
+#include <algorithm>
+#include <string>
+#include <vector>
+#include <unordered_set>
 using namespace std;string canon(vector<int>a){vector<int>b=a;reverse(b.begin(),b.end());vector<int>best(6,INT_MAX);for(int r=0;r<6;r++){vector<int>c;for(int i=0;i<6;i++)c.push_back(a[(r+i)%6]);best=min(best,c);c.clear();for(int i=0;i<6;i++)c.push_back(b[(r+i)%6]);best=min(best,c);}string s;for(int x:best)s+=to_string(x)+",";return s;}int main(){int n;cin>>n;unordered_set<string> st;for(int i=0;i<n;i++){vector<int>a(6);for(int&x:a)cin>>x;string c=canon(a);if(st.count(c)){cout<<"Twin snowflakes found.";return 0;}st.insert(c);}cout<<"No two snowflakes are alike.";}
 ```
 
@@ -9976,7 +10757,9 @@ Yes
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
 using namespace std;using ull=unsigned long long;int main(){ios::sync_with_stdio(false);cin.tie(nullptr);string s;cin>>s;int n=s.size();const ull P=131;vector<ull>h(n+1),pw(n+1,1);for(int i=1;i<=n;i++){h[i]=h[i-1]*P+(s[i-1]-'a'+1);pw[i]=pw[i-1]*P;}auto get=[&](int l,int r){return h[r]-h[l-1]*pw[r-l+1];};int m;cin>>m;while(m--){int l1,r1,l2,r2;cin>>l1>>r1>>l2>>r2;cout<<(r1-l1==r2-l2&&get(l1,r1)==get(l2,r2)?"Yes":"No")<<"\n";}}
 ```
 
@@ -10052,7 +10835,10 @@ Manacher 算法可在 O(n) 时间内求解最长回文子串。其核心思想�
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <vector>
 using namespace std;int main(){string s;cin>>s;string t="^";for(char c:s){t+="#";t+=c;}t+="#";t+="$";vector<int>p(t.size());int c=0,r=0,ans=0;for(int i=1;i+1<t.size();i++){int mir=2*c-i;if(i<r)p[i]=min(r-i,p[mir]);while(t[i+1+p[i]]==t[i-1-p[i]])p[i]++;if(i+p[i]>r)c=i,r=i+p[i];ans=max(ans,p[i]);}cout<<ans;}
 ```
 
@@ -10140,7 +10926,13 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <climits>
+#include <algorithm>
+#include <iterator>
+#include <vector>
+#include <set>
+#include <utility>
 using namespace std;int main(){int n;cin>>n;vector<long long>w(n+2),pre(n+1);for(int i=1;i<=n;i++){cin>>w[i];pre[i]=pre[i-1]+w[i];}vector<int>ord(n);for(int&i:ord)cin>>i;set<pair<int,int>> seg{{1,n}};multiset<long long> sums{pre[n]};for(int x:ord){auto it=prev(seg.upper_bound({x,INT_MAX}));int l=it->first,r=it->second;seg.erase(it);sums.erase(sums.find(pre[r]-pre[l-1]));if(l<=x-1){seg.insert({l,x-1});sums.insert(pre[x-1]-pre[l-1]);}if(x+1<=r){seg.insert({x+1,r});sums.insert(pre[r]-pre[x]);}cout<<(sums.empty()?0:*sums.rbegin())<<"\n";}}
 ```
 
@@ -10209,7 +11001,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 int main(){int n;cin>>n;vector<int>a(n),suf(n+1,0),ans,st;for(int&i:a)cin>>i;for(int i=n-1;i>=0;i--)suf[i]=max(suf[i+1],a[i]);for(int i=0;i<n;i++){st.push_back(a[i]);while(!st.empty()&&st.back()>suf[i+1]){ans.push_back(st.back());st.pop_back();}}for(int i=0;i<n;i++)cout<<ans[i]<<(i+1==n?'\n':' ');}
 ```
@@ -10299,7 +11093,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <set>
 using namespace std;int main(){ios::sync_with_stdio(false);cin.tie(nullptr);int n;cin>>n;set<int> empty;for(int i=0;i<n;i++)empty.insert(i);vector<long long>h(n);int no=0;for(int i=0;i<n;i++){long long x;cin>>x;int p=x%n;if(empty.count(p))no++;auto it=empty.lower_bound(p);if(it==empty.end())it=empty.begin();h[*it]=x;empty.erase(it);}cout<<no<<"\n";for(int i=0;i<n;i++)cout<<h[i]<<(i+1==n?'\n':' ');}
 ```
 
@@ -10369,7 +11166,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <queue>
 using namespace std;struct Node{long long sum;int i,j;bool operator<(Node const&o)const{return sum>o.sum;}};int main(){int n;cin>>n;vector<long long>A(n),B(n);for(auto&x:A)cin>>x;for(auto&x:B)cin>>x;sort(A.begin(),A.end());sort(B.begin(),B.end());priority_queue<Node>pq;for(int i=0;i<n;i++)pq.push({A[i]+B[0],i,0});for(int k=0;k<n;k++){auto cur=pq.top();pq.pop();cout<<cur.sum<<(k+1==n?'\n':' ');if(cur.j+1<n)pq.push({A[cur.i]+B[cur.j+1],cur.i,cur.j+1});}}
 ```
 
@@ -10450,7 +11250,12 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <functional>
+#include <vector>
+#include <queue>
+#include <utility>
 using namespace std;int main(){int n;cin>>n;vector<pair<int,long long>> a(n);for(auto &p:a)cin>>p.second>>p.first;sort(a.begin(),a.end(),greater<>());priority_queue<long long,vector<long long>,greater<long long>> pq;long long sum=0,ans=0;for(auto [v,val]:a){pq.push(val);sum+=val;while((int)pq.size()>v){sum-=pq.top();pq.pop();}ans=max(ans,sum);}cout<<ans;}
 ```
 # 实验6
@@ -10521,7 +11326,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 
 // 输出数组全部元素，元素间以空格分隔，末尾换行
@@ -10620,7 +11426,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 
 // 输出数组全部元素，元素间以空格分隔，末尾换行
@@ -10715,7 +11522,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 
 // 输出数组全部元素，元素间以空格分隔，末尾换行
@@ -10814,7 +11622,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
 // 输出数组全部元素，元素间以空格分隔，末尾换行
@@ -10916,7 +11726,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 
 vector<int> a;
@@ -11028,7 +11839,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
 // 输出数组全部元素，元素间以空格分隔，末尾换行
@@ -11127,7 +11940,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
 vector<int> a;
@@ -11236,7 +12051,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
 // 输出数组全部元素，元素间以空格分隔，末尾换行
@@ -11336,7 +12153,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cstdio>
+#include <vector>
 using namespace std;
 
 // 输出数组全部元素，使用 %03d 格式化以保留前导零，元素间以空格分隔
@@ -11433,7 +12252,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 
 long long ans;                  // 逆序对总数，需用 long long 防止溢出
@@ -11544,7 +12364,9 @@ n,m等所有数据均小于100
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
 int main() {
@@ -11647,7 +12469,10 @@ int main() {
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <utility>
 using namespace std;
 
 int main() {
@@ -11745,7 +12570,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <vector>
 using namespace std;
 
 int main() {
@@ -11857,7 +12685,12 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cstdlib>
+#include <cctype>
+#include <algorithm>
+#include <string>
+#include <vector>
 using namespace std;
 
 int main() {
@@ -11959,7 +12792,9 @@ int main() {
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
 int main() {
@@ -12055,7 +12890,10 @@ P为给定的二维平面整数点集。定义 P 中某点x，如果x满足 P �
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <utility>
 using namespace std;
 
 int main() {
@@ -12161,7 +12999,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cstdlib>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
 int main() {
@@ -12256,7 +13097,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <unordered_map>
 using namespace std;
 
 int main() {
@@ -12364,7 +13208,12 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <climits>
+#include <algorithm>
+#include <iterator>
+#include <vector>
+#include <map>
 using namespace std;
 
 // 组合数 C(x, 2) = x*(x-1)/2
@@ -12397,7 +13246,7 @@ int main() {
     // 若无重复元素，统计差值等于最小差值的相邻对数
     if (mnPairs == 0) {
         for (auto it = next(cnt.begin()); it != cnt.end(); ++it) {
-            auto pr = prev(it);
+            auto pr = std::prev(it);
             if (it->first - pr->first == mind)
                 mnPairs += it->second * pr->second;  // 两个相邻值的所有组合
         }
@@ -12483,7 +13332,8 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;int main(){int n,m;cin>>n>>m;vector<vector<int>>g(n+1,vector<int>(n+1));while(m--){int u,v;cin>>u>>v;g[u][v]=1;}for(int i=1;i<=n;i++){for(int j=1;j<=n;j++)cout<<g[i][j]<<(j==n?'\n':' ');} }
 ```
 
@@ -12724,8 +13574,166 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
-using namespace std;int main(){int kind,n,m;cin>>kind>>n>>m;vector<string> name(n);map<string,int> id;for(int i=0;i<n;i++){cin>>name[i];id[name[i]]=i;}vector<vector<int>>g(n);for(int i=0;i<m;i++){string a,b;cin>>a>>b;int u=id[a],v=id[b];g[u].insert(g[u].begin(),v);if(kind>=2)g[v].insert(g[v].begin(),u);if(kind==1||kind==3){int w;cin>>w;}}vector<int>vis(n);function<void(int)>dfs=[&](int u){vis[u]=1;cout<<name[u]<<' ';for(int v:g[u])if(!vis[v])dfs(v);};for(int i=0;i<n;i++)if(!vis[i])dfs(i);}
+#include <string.h>
+#include <malloc.h> /* malloc()等 */
+#include <stdio.h> /* EOF(=^Z或F6),NULL */
+#include <stdlib.h> /* exit() */
+typedef int InfoType; /* 顶点权值类型 */
+#define MAX_NAME 3 /* 顶点字符串的最大长度+1 */
+typedef char VertexType[MAX_NAME]; /* 字符串类型 */
+/* 图的邻接表存储表示 */
+#define MAX_VERTEX_NUM 20
+typedef enum{DG, DN, AG, AN} GraphKind; /* {有向图,有向网,无向图,无向网} */
+typedef struct ArcNode
+{
+    int adjvex; /* 该弧所指向的顶点的位置 */
+    struct ArcNode *nextarc; /* 指向下一条弧的指针 */
+    InfoType *info; /* 网的权值指针 */
+} ArcNode;
+
+typedef struct
+{
+    VertexType data; /* 顶点信息 */
+    ArcNode *firstarc; /* 指向第一条依附该顶点的弧的指针 */
+} VNode, AdjList[MAX_VERTEX_NUM];
+
+typedef struct
+{
+    AdjList vertices;
+    int vexnum, arcnum; /* 图的当前顶点数和弧数 */
+    int kind; /* 图的种类标志 */
+} ALGraph;
+
+int LocateVex(ALGraph G, VertexType u)
+{
+    int i;
+    for (i = 0; i < G.vexnum; ++i)
+        if (strcmp(u, G.vertices[i].data) == 0)
+            return i;
+    return -1;
+}
+
+void CreateGraph(ALGraph *G)
+{
+    int i, j, k;
+    int w;
+    VertexType va, vb;
+    ArcNode *p;
+    scanf("%d", &(*G).kind);
+    scanf("%d%d", &(*G).vexnum, &(*G).arcnum);
+    for (i = 0; i < (*G).vexnum; ++i)
+    {
+        scanf("%s", (*G).vertices[i].data);
+        (*G).vertices[i].firstarc = NULL;
+    }
+    for (k = 0; k < (*G).arcnum; ++k)
+    {
+        if ((*G).kind == 1 || (*G).kind == 3)
+            scanf("%d%s%s", &w, va, vb);
+        else
+            scanf("%s%s", va, vb);
+        i = LocateVex(*G, va);
+        j = LocateVex(*G, vb);
+        p = (ArcNode*)malloc(sizeof(ArcNode));
+        p->adjvex = j;
+        if ((*G).kind == 1 || (*G).kind == 3)
+        {
+            p->info = (int *)malloc(sizeof(int));
+            *(p->info) = w;
+        }
+        else
+            p->info = NULL;
+        p->nextarc = (*G).vertices[i].firstarc;
+        (*G).vertices[i].firstarc = p;
+        if ((*G).kind >= 2)
+        {
+            p = (ArcNode*)malloc(sizeof(ArcNode));
+            p->adjvex = i;
+            if ((*G).kind == 3)
+            {
+                p->info = (int*)malloc(sizeof(int));
+                *(p->info) = w;
+            }
+            else
+                p->info = NULL;
+            p->nextarc = (*G).vertices[j].firstarc;
+            (*G).vertices[j].firstarc = p;
+        }
+    }
+}
+
+VertexType* GetVex(ALGraph G, int v)
+{
+    if (v >= G.vexnum || v < 0)
+        exit(0);
+    return &G.vertices[v].data;
+}
+
+int FirstAdjVex(ALGraph G, VertexType v)
+{
+    ArcNode *p;
+    int v1;
+    v1 = LocateVex(G, v);
+    p = G.vertices[v1].firstarc;
+    if (p)
+        return p->adjvex;
+    else
+        return -1;
+}
+
+int NextAdjVex(ALGraph G, VertexType v, VertexType w)
+{
+    ArcNode *p;
+    int v1, w1;
+    v1 = LocateVex(G, v);
+    w1 = LocateVex(G, w);
+    p = G.vertices[v1].firstarc;
+    while (p && p->adjvex != w1)
+        p = p->nextarc;
+    if (!p || !p->nextarc)
+        return -1;
+    else
+        return p->nextarc->adjvex;
+}
+
+/* 深度遍历 */
+int visited[MAX_VERTEX_NUM]; /* 访问标志数组 */
+void (*VisitFunc)(char* v); /* 函数变量 */
+void print(char *i);
+
+void DFS(ALGraph G, int v)
+{ /* 从第v个顶点出发递归地深度优先遍历图G。算法7.5 */
+    visited[v] = 1;
+    VisitFunc(G.vertices[v].data);
+    for (ArcNode *p = G.vertices[v].firstarc; p != NULL; p = p->nextarc)
+    {
+        int w = p->adjvex;
+        if (!visited[w]) DFS(G, w);
+    }
+}
+
+void DFSTraverse(ALGraph G)
+{ /* 对图G作深度优先遍历。算法7.4 */
+    VisitFunc = print;
+    for (int v = 0; v < G.vexnum; ++v)
+        visited[v] = 0;
+    for (int v = 0; v < G.vexnum; ++v)
+        if (!visited[v]) DFS(G, v);
+    printf("\n");
+}
+
+void print(char *i)
+{
+    printf("%s ", i);
+}
+
+int main()
+{
+    ALGraph g;
+    CreateGraph(&g);
+    DFSTraverse(g);
+    return 0;
+}
 ```
 
 ## 116. 8649 图的广度遍历
@@ -12801,7 +13809,11 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <queue>
+#include <map>
 using namespace std;int main(){int kind,n,m;cin>>kind>>n>>m;vector<string> name(n);map<string,int> id;for(int i=0;i<n;i++){cin>>name[i];id[name[i]]=i;}vector<vector<int>>g(n);for(int i=0;i<m;i++){string a,b;cin>>a>>b;int u=id[a],v=id[b];g[u].insert(g[u].begin(),v);if(kind>=2)g[v].insert(g[v].begin(),u);if(kind==1||kind==3){int w;cin>>w;}}vector<int>vis(n);queue<int>q;for(int s=0;s<n;s++)if(!vis[s]){vis[s]=1;q.push(s);while(!q.empty()){int u=q.front();q.pop();cout<<name[u]<<' ';for(int v:g[u])if(!vis[v])vis[v]=1,q.push(v);}}}
 ```
 
@@ -12884,7 +13896,11 @@ using namespace std;int main(){int kind,n,m;cin>>kind>>n>>m;vector<string> name(
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <numeric>
+#include <functional>
+#include <vector>
 using namespace std;struct E{int u,v;long long w;bool operator<(E const&o)const{return w<o.w;}};int main(){int n,m;cin>>n>>m;vector<E>e(m);for(auto&x:e)cin>>x.u>>x.v>>x.w;sort(e.begin(),e.end());vector<int>p(n+1);iota(p.begin(),p.end(),0);function<int(int)>f=[&](int x){return p[x]==x?x:p[x]=f(p[x]);};long long ans=0;for(auto x:e){int a=f(x.u),b=f(x.v);if(a!=b){p[a]=b;ans+=x.w;}}cout<<ans;}
 ```
 
@@ -12962,7 +13978,11 @@ Dijkstra 算法的核心思想是贪心策略：每次从未确定最短距离�
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <functional>
+#include <vector>
+#include <queue>
+#include <utility>
 using namespace std;int main(){int n,m;cin>>n>>m;const int INF=1e9;vector<vector<pair<int,int>>>g(n+1);for(int i=0,u,v,w;i<m;i++){cin>>u>>v>>w;g[u].push_back({v,w});g[v].push_back({u,w});}vector<int>d(n+1,INF);priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;d[1]=0;pq.push({0,1});while(!pq.empty()){auto [du,u]=pq.top();pq.pop();if(du!=d[u])continue;for(auto [v,w]:g[u])if(d[v]>du+w){d[v]=du+w;pq.push({d[v],v});}}cout<<(d[n]==INF?-1:d[n]);}
 ```
 
@@ -13046,7 +14066,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <functional>
+#include <vector>
+#include <queue>
 using namespace std;int main(){int n,m;cin>>n>>m;vector<vector<int>>g(n+1);vector<int>in(n+1);while(m--){int a,b;cin>>a>>b;g[a].push_back(b);in[b]++;}priority_queue<int,vector<int>,greater<int>>q;for(int i=1;i<=n;i++)if(!in[i])q.push(i);vector<int>ans;while(!q.empty()){int u=q.top();q.pop();ans.push_back(u);for(int v:g[u])if(--in[v]==0)q.push(v);}for(int i=0;i<ans.size();i++)cout<<ans[i]<<(i+1==ans.size()?'\n':' ');}
 ```
 
@@ -13124,7 +14147,12 @@ using namespace std;int main(){int n,m;cin>>n>>m;vector<vector<int>>g(n+1);vecto
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <climits>
+#include <algorithm>
+#include <vector>
+#include <queue>
+#include <utility>
 using namespace std;int main(){int n,m;cin>>n>>m;vector<vector<pair<int,int>>>g(n+1);vector<int>in(n+1);for(int i=0,u,v,w;i<m;i++){cin>>u>>v>>w;g[u].push_back({v,w});in[v]++;}queue<int>q;for(int i=1;i<=n;i++)if(!in[i])q.push(i);vector<long long>d(n+1,LLONG_MIN/4);d[1]=0;while(!q.empty()){int u=q.front();q.pop();for(auto [v,w]:g[u]){if(d[u]>LLONG_MIN/8)d[v]=max(d[v],d[u]+w);if(--in[v]==0)q.push(v);}}cout<<d[n];}
 ```
 
@@ -13211,7 +14239,9 @@ using namespace std;int main(){int n,m;cin>>n>>m;vector<vector<pair<int,int>>>g(
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;int main(){int n,m;cin>>n>>m;vector<vector<int>>g(n+1);while(m--){int u,v;cin>>u>>v;g[u].push_back(v);g[v].push_back(u);}for(int i=1;i<=n;i++){sort(g[i].begin(),g[i].end());cout<<i<<":";for(int v:g[i])cout<<v<<' ';cout<<"\n";}}
 ```
 
@@ -13292,7 +14322,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <functional>
+#include <vector>
 using namespace std;int main(){ios::sync_with_stdio(false);cin.tie(nullptr);int T,n;cin>>T>>n;vector<long long>val(n+1),sum(n+1);for(int i=1;i<=n;i++)cin>>val[i];vector<vector<int>>g(n+1);for(int i=1,u,v;i<n;i++){cin>>u>>v;g[u].push_back(v);g[v].push_back(u);}vector<long long>all;function<void(int,int)>dfs=[&](int u,int p){sum[u]=val[u];for(int v:g[u])if(v!=p){dfs(v,u);sum[u]+=sum[v];}all.push_back(sum[u]);};dfs(T,0);nth_element(all.begin(),all.begin()+n/2,all.end());cout<<all[n/2];}
 ```
 
@@ -13389,7 +14422,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <functional>
+#include <vector>
 using namespace std;int main(){int n;cin>>n;vector<vector<int>>g(n+1);for(int i=1,u,v;i<n;i++){cin>>u>>v;g[u].push_back(v);g[v].push_back(u);}vector<int>sz(n+1),ans;int best=n;function<void(int,int)>dfs=[&](int u,int p){sz[u]=1;int mx=0;for(int v:g[u])if(v!=p){dfs(v,u);sz[u]+=sz[v];mx=max(mx,sz[v]);}mx=max(mx,n-sz[u]);if(mx<best){best=mx;ans.clear();ans.push_back(u);}else if(mx==best)ans.push_back(u);};dfs(1,0);sort(ans.begin(),ans.end());for(int i=0;i<ans.size();i++)cout<<ans[i]<<(i+1==ans.size()?'\n':' ');}
 ```
 
@@ -13478,7 +14514,9 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <queue>
 using namespace std;int main(){int T;cin>>T;while(T--){int n;cin>>n;vector<vector<int>>g(n);vector<int>in(n);for(int i=0;i<n;i++)for(int j=0,x;j<n;j++){cin>>x;if(x){g[j].push_back(i);in[i]++;}}queue<int>q;for(int i=0;i<n;i++)if(!in[i])q.push(i);int cnt=0;while(!q.empty()){int u=q.front();q.pop();cnt++;for(int v:g[u])if(--in[v]==0)q.push(v);}cout<<(cnt==n?0:1)<<"\n";}}
 ```
 
@@ -13555,7 +14593,12 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <cctype>
+#include <functional>
+#include <string>
+#include <vector>
+#include <queue>
 using namespace std;int main(){string s;cin>>s;vector<int>dep;for(int i=0;i<s.size();){int sign=1;if(s[i]=='-')sign=-1,i++;int v=0;while(i<s.size()&&isdigit((unsigned char)s[i]))v=v*10+s[i++]-'0';dep.push_back(sign*v);if(i<s.size()&&s[i]==',')i++;}int n=dep.size();vector<vector<int>>g(n);vector<int>in(n);for(int i=0;i<n;i++)if(dep[i]!=-1){g[dep[i]].push_back(i);in[i]++;}priority_queue<int,vector<int>,greater<int>>q;for(int i=0;i<n;i++)if(!in[i])q.push(i);vector<int>ans;while(!q.empty()){int u=q.top();q.pop();ans.push_back(u);for(int v:g[u])if(--in[v]==0)q.push(v);}for(int i=0;i<ans.size();i++){if(i)cout<<',';cout<<ans[i];}}
 ```
 
@@ -13642,7 +14685,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <queue>
 using namespace std;int main(){int n;cin>>n;vector<int>a(n+1);for(int i=1;i<=n;i++)cin>>a[i];vector<vector<int>>dag(n+1);vector<int>in(n+1),dp(n+1,1);for(int i=1,u,v;i<n;i++){cin>>u>>v;if(a[u]<a[v])dag[u].push_back(v),in[v]++;else if(a[v]<a[u])dag[v].push_back(u),in[u]++;}queue<int>q;for(int i=1;i<=n;i++)if(!in[i])q.push(i);int ans=1;while(!q.empty()){int u=q.front();q.pop();ans=max(ans,dp[u]);for(int v:dag[u]){dp[v]=max(dp[v],dp[u]+1);if(--in[v]==0)q.push(v);}}cout<<ans;}
 ```
 
@@ -13728,7 +14774,10 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <numeric>
+#include <functional>
+#include <vector>
 using namespace std;int main(){int n,m;cin>>n>>m;vector<int>par(n+1),head(n+1),tail(n+1);iota(par.begin(),par.end(),0);iota(head.begin(),head.end(),0);iota(tail.begin(),tail.end(),0);function<int(int)>f=[&](int x){return par[x]==x?x:par[x]=f(par[x]);};while(m--){int x,y;cin>>x>>y;int rx=f(x),ry=f(y);if(rx==ry)continue;par[rx]=ry;head[ry]=head[ry];}for(int i=1;i<=n;i++)cout<<head[f(i)]<<(i==n?'\n':' ');}
 ```
 
@@ -13813,7 +14862,12 @@ a，b可能相同，也可能出现重复的关系
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <numeric>
+#include <functional>
+#include <vector>
+#include <map>
 using namespace std;int main(){int n,m;cin>>n>>m;vector<int>p(n+1);iota(p.begin(),p.end(),0);function<int(int)>f=[&](int x){return p[x]==x?x:p[x]=f(p[x]);};while(m--){int a,b;cin>>a>>b;p[f(a)]=f(b);}map<int,vector<int>>mp;for(int i=1;i<=n;i++)mp[f(i)].push_back(i);vector<vector<int>> groups;for(auto &[r,v]:mp){sort(v.begin(),v.end());groups.push_back(v);}sort(groups.begin(),groups.end(),[](auto&a,auto&b){return a[0]<b[0];});cout<<groups.size()<<"\n";for(auto &v:groups){for(int i=0;i<v.size();i++)cout<<v[i]<<(i+1==v.size()?'\n':' ');}}
 ```
 
@@ -13903,7 +14957,11 @@ Hint
 **C++ 参考答案**
 
 ```cpp
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
+#include <functional>
+#include <vector>
+#include <queue>
+#include <utility>
 using namespace std;int main(){int N,K,M;cin>>N>>K>>M;vector<vector<pair<int,int>>>g(N+1);for(int i=0,v,u,w;i<M;i++){cin>>v>>u>>w;g[v].push_back({u,w});}const int INF=1e9;vector<int>d(N+1,INF);priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;d[K]=0;pq.push({0,K});while(!pq.empty()){auto [du,u]=pq.top();pq.pop();if(du!=d[u])continue;for(auto [v,w]:g[u])if(d[v]>du+w){d[v]=du+w;pq.push({d[v],v});}}int ans=0;for(int i=1;i<=N;i++){if(d[i]==INF){cout<<-1;return 0;}ans=max(ans,d[i]);}cout<<ans;}
 ```
-
