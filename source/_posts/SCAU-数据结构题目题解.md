@@ -445,7 +445,7 @@ int main() {
             Load_Sq(T);
             break;
         case 0:
-            return 1;
+            return 0;
         }
     }
 }
@@ -552,6 +552,42 @@ int main() {
     return 0;
 }
 ```
+**邪修做法（可过 OJ）**
+
+利用题目只要求最终 C 有序，直接把 A、B 全部放进 C 后排序；不利用“两个表本来有序”的条件，代码更短但时间复杂度变为 O((n+m)log(n+m))。
+
+~~~cpp
+#include <algorithm>
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void print(const char *name, const vector<int> &a) {
+    cout << name;
+    for (int x : a)
+        cout << x << ' ';
+    cout << '\n';
+}
+
+int main() {
+    int na, nb;
+    cin >> na;
+    vector<int> A(na);
+    for (int &x : A)
+        cin >> x;
+    cin >> nb;
+    vector<int> B(nb), C = A;
+    for (int &x : B) {
+        cin >> x;
+        C.push_back(x);
+    }
+    sort(C.begin(), C.end());
+    print("List A:", A);
+    print("List B:", B);
+    print("List C:", C);
+}
+~~~
+
 
 ## 3. 8578 顺序表逆置
 
@@ -1060,7 +1096,7 @@ int main() {
             LoadLink_L(T);
             break;
         case 0:
-            return 1;
+            return 0;
         }
     }
 }
@@ -1442,6 +1478,26 @@ int main() {
 }
 ```
 
+**邪修做法（可过 OJ）**
+
+OJ 只检查最终输出时，不必真的建立和反转链表；读入数组后倒序输出即可。这个写法不满足题面 O(1) 空间要求，但通常能过纯输入输出评测。
+
+~~~cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (int &x : a)
+        cin >> x;
+    for (int i = n - 1; i >= 0; i--)
+        cout << a[i] << ' ';
+}
+~~~
+
 # 拓展习题1
 
 ## 7. 18711 字符串去重
@@ -1515,6 +1571,25 @@ int main() {
     }
 }
 ```
+**邪修做法（可过 OJ）**
+
+小写字母只有 26 个，也可以直接丢进 `set`，让容器自动去重和排序。
+
+~~~cpp
+#include <iostream>
+#include <set>
+using namespace std;
+
+int main() {
+    int n;
+    string s;
+    cin >> n >> s;
+    set<char> st(s.begin(), s.end());
+    for (char c : st)
+        cout << c;
+}
+~~~
+
 
 ## 8. 18710 统计不同数字的个数(升级版)
 
@@ -1621,6 +1696,27 @@ int main() {
     return 0;
 }
 ```
+**邪修做法（可过 OJ）**
+
+值域虽然可开桶，但直接用 `set` 统计不同元素也能过；代码短，复杂度是 O(nlogn)。
+
+~~~cpp
+#include <iostream>
+#include <set>
+using namespace std;
+
+int main() {
+    int n, x;
+    cin >> n;
+    set<int> st;
+    while (n--) {
+        cin >> x;
+        st.insert(x);
+    }
+    cout << st.size();
+}
+~~~
+
 
 ## 9. 18927 前缀和
 
@@ -2135,6 +2231,10 @@ int main() {
         cout << a[n - k]; // 倒数第 k 个元素对应数组下标 n-k
 }
 ```
+**邪修做法（可过 OJ）**
+
+本题标准答案本身已经是捷径：OJ 按输入输出判题，不强制真的建链表，因此直接读入数组并输出 `a[n-k]` 即可。
+
 
 ## 15. 19084 万万没想到之聪明的编辑
 
@@ -2820,7 +2920,7 @@ int main() {
             StackTraverse(S); // 请填空
             break;
         case 0:
-            return 1;
+            return 0;
         }
     }
 }
@@ -3176,7 +3276,7 @@ int main() {
             QueueTraverse(S); // 请填空
             break;
         case 0:
-            return 1;
+            return 0;
         }
     }
 }
@@ -3385,11 +3485,10 @@ matching
 
 ```cpp
 typedef char SElemType;
+#include "malloc.h"
 #include "math.h"
 #include "stdio.h"
 #include "stdlib.h" // exit()
-#include <iostream>
-using namespace std;
 #define OK 1
 #define ERROR 0
 #define TRUE 1
@@ -3403,36 +3502,35 @@ struct SqStack {
     int stacksize;   // 当前已分配的存储空间，以元素为单位
 };                   // 顺序栈
 Status InitStack(SqStack &S) {
-    // 分配存储空间并初始化指针
-    S.base = new SElemType[STACK_INIT_SIZE];
+    S.base = (SElemType *)malloc(STACK_INIT_SIZE * sizeof(SElemType));
     if (!S.base)
         return ERROR;
-    S.top = S.base; // top与base指向同一位置，表示栈为空
+    S.top = S.base;
     S.stacksize = STACK_INIT_SIZE;
     return OK;
 }
 
 Status StackEmpty(SqStack S) {
-    // 判断栈是否为空：top与base相等即为空
-    if (S.base == S.top)
-        return OK;
+    if (S.top == S.base)
+        return TRUE;
     else
-        return ERROR;
+        return FALSE;
 }
 Status Push(SqStack &S, SElemType e) {
-    // 元素e入栈，需先判满
-    if (S.top - S.base == S.stacksize)
-        return ERROR;
-
-    *(S.top++) = e; // 存入元素后top后移
+    if (S.top - S.base >= S.stacksize) {
+        S.base = (SElemType *)realloc(S.base, (S.stacksize + STACKINCREMENT) * sizeof(SElemType));
+        if (!S.base)
+            return ERROR;
+        S.top = S.base + S.stacksize;
+        S.stacksize += STACKINCREMENT;
+    }
+    *(S.top++) = e;
     return OK;
 }
 Status Pop(SqStack &S, SElemType &e) {
-    // 栈顶元素出栈，需先判空
     if (S.top == S.base)
         return ERROR;
-
-    e = *(--S.top); // top先回退，再取出元素
+    e = *(--S.top);
     return OK;
 }
 void check() { // 对于输入的任意一个字符串，检验括号是否配对
@@ -3441,7 +3539,7 @@ void check() { // 对于输入的任意一个字符串，检验括号是否配�
     if (InitStack(s)) // 初始化栈成功
     {
         // printf("请输入表达式\n");
-        cin >> ch;
+        scanf("%s", ch);
         p = ch;
         while (*p) // 没到串尾
             switch (*p) {
@@ -3642,6 +3740,7 @@ type int element
 
 ```cpp
 typedef char SElemType;
+#include "malloc.h"
 #include "math.h"
 #include "stdio.h"
 #include "stdlib.h" // exit()
@@ -3650,8 +3749,8 @@ typedef char SElemType;
 #define TRUE 1
 #define FALSE 0
 typedef int Status;         // Status是函数的类型,其值是函数结果状态代码，如OK等
-#define STACK_INIT_SIZE 100 // 存储空间初始分配量
-#define STACKINCREMENT 2    // 存储空间分配增量
+#define STACK_INIT_SIZE 10 // 存储空间初始分配量
+#define STACKINCREMENT 2   // 存储空间分配增量
 struct SqStack {
     SElemType *base; // 在栈构造之前和销毁之后，base的值为NULL
     SElemType *top;  // 栈顶指针
@@ -3659,21 +3758,21 @@ struct SqStack {
 };                   // 顺序栈
 
 Status InitStack(SqStack &S) { // 构造一个空栈S
-    S.base = new SElemType[STACK_INIT_SIZE];
+    S.base = (SElemType *)malloc(STACK_INIT_SIZE * sizeof(SElemType));
     if (!S.base)
         return ERROR;
-    S.top = S.base; // top与base指向同一位置，表示栈为空
+    S.top = S.base;
     S.stacksize = STACK_INIT_SIZE;
     return OK;
 }
 Status StackEmpty(SqStack S) { // 若栈S为空栈，则返回TRUE，否则返回FALSE
     if (S.top == S.base)
-        return TRUE; // top与base相等表示栈为空
+        return TRUE;
     else
         return FALSE;
 }
 Status ClearStack(SqStack &S) { // 把S置为空栈
-    S.top = S.base;             // 将top回退至base位置，逻辑上清空栈
+    S.top = S.base;
     return OK;
 }
 Status DestroyStack(SqStack &S) { // 销毁栈S，S不再存在
@@ -3684,16 +3783,21 @@ Status DestroyStack(SqStack &S) { // 销毁栈S，S不再存在
     return OK;
 }
 Status Push(SqStack &S, SElemType e) { // 插入元素e为新的栈顶元素
-    if (S.top - S.base == S.stacksize)
-        return ERROR; // 栈已满，无法入栈
-    *S.top++ = e;     // 存入元素后top后移
+    if (S.top - S.base >= S.stacksize) {
+        S.base = (SElemType *)realloc(S.base, (S.stacksize + STACKINCREMENT) * sizeof(SElemType));
+        if (!S.base)
+            return ERROR;
+        S.top = S.base + S.stacksize;
+        S.stacksize += STACKINCREMENT;
+    }
+    *S.top++ = e;
     return OK;
 }
 Status Pop(SqStack &S,
            SElemType &e) { // 若栈不空，则删除S的栈顶元素，用e返回其值，并返回OK；否则返回ERROR
     if (S.top == S.base)
-        return ERROR; // 栈为空，无法出栈
-    e = *--S.top;     // top先回退，再取出该位置的元素
+        return ERROR;
+    e = *--S.top;
     return OK;
 }
 Status
@@ -3717,27 +3821,28 @@ void LineEdit() { // 利用字符栈s，从终端接收一行并送至调用过�
     scanf("%d", &n);
     ch = getchar();
     for (i = 1; i <= n; i++) {
-        ch = getchar(); // 读取当前行的第一个字符
+        ch = getchar();
         while (ch != '\n') {
             switch (ch) {
             case '#':
-                Pop(s, c); // 退格符：弹出栈顶元素，撤销上一个字符
+                Pop(s, c);
                 break;     // 仅当栈非空时退栈
             case '@':
-                ClearStack(s); // 退行符：清空栈，撤销当前行全部内容
+                ClearStack(s);
                 break;         // 重置s为空栈
             default:
-                Push(s, ch); // 普通字符：作为有效字符压入栈中
+                Push(s, ch);
             }
-            ch = getchar(); // 继续从终端读取下一个字符
+            ch = getchar();
         }
         StackTraverse(s, visit); // 将从栈底到栈顶的栈内字符输出
-        ClearStack(s);           // 当前行处理完毕，清空栈以准备处理下一行
+        ClearStack(s);           // 重置s为空栈
     }
     DestroyStack(s);
 }
 int main() {
     LineEdit();
+    return 0;
 }
 ```
 
@@ -7614,7 +7719,7 @@ Hint
 
 **输出格式**
 
-每个数字占 3 个字符宽度，右对齐，使用 `printf("%3d", val)` 即可满足格式要求。
+除第一行第一个数字外，每个数字占 3 个字符宽度，右对齐；这样既能保持列对齐，也能匹配样例首行不带行首空格的格式。
 
 **算法分析**
 
@@ -7668,10 +7773,14 @@ int main() {
         }
     }
 
-    // 按格式输出：每个数字占 3 位宽度，右对齐
+    // 按样例格式输出：首行首个数字不额外补空格，其余数字占 3 位宽度
     for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++)
-            printf("%3d", a[i][j]);
+        for (int j = 0; j < n; j++) {
+            if (i == 0 && j == 0)
+                printf("%d", a[i][j]);
+            else
+                printf("%3d", a[i][j]);
+        }
         printf("\n");
     }
 }
@@ -8573,8 +8682,9 @@ int main()
 **C++ 参考答案**
 
 ```cpp
-#include <stdio.h>
-#include <string.h>
+#include "malloc.h"
+#include "stdio.h"
+#include "string.h"
 using namespace std;
 typedef struct {
     unsigned int weight;
@@ -8582,10 +8692,8 @@ typedef struct {
 } HTNode, *HuffmanTree;
 typedef char **HuffmanCode;
 
-void select(
-    HuffmanTree &HT, int n, int &s1,
-    int &
-        s2) { // 在HT[1..n]中选择parent为0且weight最小的两个结点，序号分别为s1（最小）和s2（次小）。
+void select(HuffmanTree &HT, int n, int &s1, int &s2) {
+    // 在HT[1..n]中选择parent为0且weight最小的两个结点，序号分别为s1（最小）和s2（次小）。
     s1 = s2 = 0;
     for (int i = 1; i <= n; i++) {
         if (HT[i].parent != 0)
@@ -9321,17 +9429,18 @@ Hint
 
 **题目要求**
 
-给定完全二叉树的顺序存储序列，求树中任意两个结点之间最长路径的长度（路径长度为路径上的结点数减 1，即边数；但本题按路径上的结点数计算，由样例可知长度为 4 的路径包含 4 条边）。
+给定完全二叉树的顺序存储序列，求树中任意两个结点之间最长路径的长度。由样例可知，本题的路径长度按**边数**计算。
 
 **解题思路**
 
-1. **本质与二叉树直径相同**：对于每个结点，经过该结点的最长路径等于其左子树的最大深度加上右子树的最大深度。
-2. **递归求解**：利用完全二叉树的顺序存储性质（下标 i 的结点，左孩子为 2i+1，右孩子为 2i+2），递归计算每个结点左右子树的最大深度。在递归过程中，用 `left + right + 1` 更新全局最大值（即经过当前结点的最长路径所含的结点数）。
+1. **本质与二叉树直径相同**：对于每个结点，经过该结点的最长路径边数等于其左子树最大深度加上右子树最大深度。
+2. **递归求解**：利用完全二叉树的顺序存储性质（下标 i 的结点，左孩子为 2i+1，右孩子为 2i+2），递归计算每个结点左右子树的最大深度。在递归过程中，用 `left + right` 更新全局最大值。
 
 **注意事项**
 
 - 注意 `#` 表示空结点，需跳过处理。
 - 下标越界或字符为 `#` 时，返回深度 0。
+- 输入的 `n` 表示非空结点数，不是顺序存储字符串长度，递归边界应以字符串长度为准。
 
 **算法分析**
 
@@ -9355,11 +9464,11 @@ int main() {
 
     // 递归计算以 i 为根的子树的最大深度，同时更新最长路径
     function<int(int)> dep = [&](int i) {
-        if (i >= n || i >= (int)s.size() || s[i] == '#')
+        if (i >= (int)s.size() || s[i] == '#')
             return 0;              // 空结点或越界，深度为 0
         int l = dep(i * 2 + 1);    // 左子树最大深度
         int r = dep(i * 2 + 2);    // 右子树最大深度
-        ans = max(ans, l + r + 1); // 经过当前结点的最长路径结点数
+        ans = max(ans, l + r);     // 经过当前结点的最长路径边数
         return max(l, r) + 1;      // 返回当前子树的最大深度
     };
 
@@ -9455,11 +9564,16 @@ Hint
 
 ```cpp
 #include <algorithm>
-#include <functional>
 #include <iostream>
+#include <stack>
 #include <utility>
 #include <vector>
 using namespace std;
+
+struct State {
+    int u, p;
+    long long d;
+};
 
 int main() {
     ios::sync_with_stdio(false);
@@ -9480,17 +9594,20 @@ int main() {
     long long sum = 0; // 花店到所有客户的距离之和
     long long mx = 0;  // 花店到最远客户的距离
 
-    // DFS：u 为当前结点，p 为父结点，d 为根到当前结点的距离
-    function<void(int, int, long long)> dfs = [&](int u, int p, long long d) {
-        sum += d;        // 累加根到当前结点的距离
-        mx = max(mx, d); // 更新最远距离
-        for (auto [v, w] : g[u]) {
-            if (v != p)
-                dfs(v, u, d + w); // 递归访问子结点
+    // 显式栈 DFS，避免 n=100000 时递归过深导致栈溢出
+    stack<State> st;
+    st.push({1, 0, 0});
+    while (!st.empty()) {
+        State cur = st.top();
+        st.pop();
+        sum += cur.d;        // 累加根到当前结点的距离
+        mx = max(mx, cur.d); // 更新最远距离
+        for (auto [v, w] : g[cur.u]) {
+            if (v != cur.p)
+                st.push({v, cur.u, cur.d + w});
         }
-    };
+    }
 
-    dfs(1, 0, 0); // 从花店（结点 1）开始 DFS
     // 输出距离之和与最短行走路程
     cout << sum << ' ' << 2 * total - mx;
 }
@@ -9846,6 +9963,31 @@ int main() {
     cout << "The element is not exist.";
 }
 ```
+**邪修做法（可过 OJ）**
+
+递增数组可以直接调用 `lower_bound`。注意题目要求位置从 0 开始。
+
+~~~cpp
+#include <algorithm>
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    int n, key;
+    cin >> n;
+    vector<int> a(n);
+    for (int &x : a)
+        cin >> x;
+    cin >> key;
+    auto it = lower_bound(a.begin(), a.end(), key);
+    if (it != a.end() && *it == key)
+        cout << "The element position is " << it - a.begin() << ".";
+    else
+        cout << "The element is not exist.";
+}
+~~~
+
 
 ## 73. 8622 哈希查找
 
@@ -12702,7 +12844,7 @@ int main() {
 4 0 5 3 2 6 7 1 8 9
 0 4 3 2 5 6 1 7 8 9
 0 3 2 4 5 1 6 7 8 9
-0 2 3 4 5 1 6 7 8 9
+0 2 3 4 1 5 6 7 8 9
 0 2 3 1 4 5 6 7 8 9
 0 2 1 3 4 5 6 7 8 9
 0 1 2 3 4 5 6 7 8 9
@@ -12728,6 +12870,10 @@ Hint
 - 时间复杂度：最坏 O(n²)（逆序输入），最好 O(n)（已有序，一趟无交换即结束）
 - 空间复杂度：O(1)，原地排序
 - 稳定性：稳定排序（仅交换相邻元素，不改变相同元素的相对顺序）
+
+**样例说明**
+
+按冒泡排序从左到右逐趟交换相邻逆序元素，样例第 5 行应为 `0 2 3 4 1 5 6 7 8 9`。若写作 `0 2 3 4 5 1 6 7 8 9`，则与第 4、6 行之间的相邻交换过程不一致。
 
 **C++ 参考答案**
 
@@ -16520,3 +16666,41 @@ int main() {
     cout << ans;
 }
 ```
+**邪修做法（可过 OJ）**
+
+由于 N <= 30，直接 Floyd 全源最短路也很省事，不需要优先队列。
+
+~~~cpp
+#include <algorithm>
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    int n, k, m;
+    cin >> n >> k >> m;
+    const int INF = 1000000000;
+    vector<vector<int>> d(n + 1, vector<int>(n + 1, INF));
+    for (int i = 1; i <= n; i++)
+        d[i][i] = 0;
+    while (m--) {
+        int u, v, w;
+        cin >> u >> v >> w;
+        d[u][v] = min(d[u][v], w);
+    }
+    for (int t = 1; t <= n; t++)
+        for (int i = 1; i <= n; i++)
+            for (int j = 1; j <= n; j++)
+                if (d[i][t] < INF && d[t][j] < INF)
+                    d[i][j] = min(d[i][j], d[i][t] + d[t][j]);
+    int ans = 0;
+    for (int i = 1; i <= n; i++) {
+        if (d[k][i] == INF) {
+            cout << -1;
+            return 0;
+        }
+        ans = max(ans, d[k][i]);
+    }
+    cout << ans;
+}
+~~~
